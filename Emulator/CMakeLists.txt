@@ -3,3 +3,4 @@ set(SOURCES
         )
 
 add_executable(Emulator ${SOURCES})
+target_link_libraries(Emulator LibGraphics)
