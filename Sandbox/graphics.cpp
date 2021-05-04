@@ -36,24 +36,45 @@ protected:
 };
 
 class MySquare : public Graphics::Entity {
+public:
+    MySquare()
+        : Graphics::Entity(), m_rect(Graphics::Types::Square<int>({ .r = 100, .g = 0, .b = 0, .a = 0 }, 0, 0, 100)) {}
+    void update() override
+    {
+        auto x = m_rect.get_x();
+        auto y = m_rect.get_y();
+        x++;
+        y++;
+        m_rect.set_x(x);
+        m_rect.set_y(y);
+    }
+
 protected:
     void draw_component(std::shared_ptr<Graphics::Painter> painter) override
     {
-        Graphics::Types::Color color = { .r = 100, .g = 0, .b = 0, .a = 0 };
-        Graphics::Types::Square<int> rect(color, 0, 0, 100);
-        painter->draw_square(rect, true);
+        painter->draw_square(m_rect, true);
+    }
+private:
+    Graphics::Types::Square<int> m_rect;
+};
+
+class MyWindow : public Graphics::Window {
+public:
+    MyWindow(Graphics::Types::Size size, std::string title)
+        : Graphics::Window(size, std::move(title))
+    {
+        auto square = std::make_unique<MySquare>();
+//        auto rect = std::make_unique<MyRect>();
+        set_clear_color(100, 100, 0, 0);
+        register_entity(std::move(square));
+//        register_entity(std::move(rect));
     }
 };
 
 int main()
 {
     Graphics::Types::Size size(500, 500);
-    Graphics::Window window(size, "Test Window");
-    window.set_clear_color(100, 100, 0, 0);
-    auto square = std::make_unique<MySquare>();
-    auto rect = std::make_unique<MyRect>();
-    window.register_entity(std::move(square));
-    window.register_entity(std::move(rect));
+    MyWindow window(size, "Test Window");
     window.run();
     return 0;
 }

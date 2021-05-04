@@ -29,6 +29,8 @@ namespace Graphics {
     class Entity {
     public:
         void draw(const std::shared_ptr<Painter>& painter);
+        virtual void update() = 0;
+
     protected:
         virtual void draw_component(std::shared_ptr<Painter> painter) = 0;
     };

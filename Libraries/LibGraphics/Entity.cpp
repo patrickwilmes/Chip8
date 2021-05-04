@@ -27,3 +27,4 @@ void Graphics::Entity::draw(const std::shared_ptr<Painter>& painter)
 {
     draw_component(painter);
 }
+
