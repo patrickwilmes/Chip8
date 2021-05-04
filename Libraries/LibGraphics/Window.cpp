@@ -33,6 +33,7 @@ Graphics::Window::Window(Graphics::Types::Size size, std::string title)
     Graphics::Types::Point position(m_screen_width / 2 - size.get_first() / 2, m_screen_height / 2 - size.get_second() / 2);
     m_window = create_window(position, size, std::move(title));
     m_renderer = create_renderer(m_window);
+    m_painter = initialize_painter(m_renderer, m_clear_color);
 }
 
 Graphics::Window::Window(Graphics::Types::Point position, Graphics::Types::Size size, std::string title)
@@ -44,6 +45,8 @@ Graphics::Window::Window(Graphics::Types::Point position, Graphics::Types::Size 
     auto screen_info = initialize_screen_info();
     m_screen_width = screen_info.get_first();
     m_screen_height = screen_info.get_second();
+
+    m_painter = initialize_painter(m_renderer, m_clear_color);
 }
 
 Graphics::Window::~Window()
@@ -81,6 +84,12 @@ SDL_Renderer* Graphics::Window::create_renderer(SDL_Window* window)
     return renderer;
 }
 
+std::shared_ptr<Graphics::Painter> Graphics::Window::initialize_painter(SDL_Renderer* renderer, Graphics::Types::Color clear_color)
+{
+    auto painter = std::make_shared<Painter>(renderer, clear_color);
+    return painter;
+}
+
 void Graphics::Window::run()
 {
     SDL_Event e;
@@ -96,7 +105,9 @@ void Graphics::Window::run()
         SDL_SetRenderDrawColor(m_renderer, m_clear_color.r, m_clear_color.g, m_clear_color.b, m_clear_color.a);
         SDL_RenderClear(m_renderer);
 
-        //TODO: draw here
+        std::for_each(m_entities.begin(), m_entities.end(), [&](const std::unique_ptr<Entity>& entity) {
+           entity->draw(m_painter);
+        });
 
         SDL_RenderPresent(m_renderer);
     }
@@ -119,4 +130,9 @@ void Graphics::Window::set_clear_color(Graphics::Types::Color color)
 void Graphics::Window::set_clear_color(int r, int g, int b, int a)
 {
     set_clear_color({ .r = r, .g = g, .b = b, .a = a });
+}
+
+void Graphics::Window::register_entity(std::unique_ptr<Entity> entity)
+{
+    m_entities.emplace_back(std::move(entity));
 }

@@ -21,12 +21,27 @@
 // CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#include <Entity.h>
 #include <Window.h>
+#include <memory>
 
-int main() {
+class MyEntity : public Graphics::Entity {
+protected:
+    void draw_component(std::shared_ptr<Graphics::Painter> painter) override
+    {
+        Graphics::Types::Color color = { .r = 100, .g = 0, .b = 0, .a = 0 };
+        Graphics::Types::Rectangle<int> rect(color, 0, 0, 100, 150);
+        painter->draw_rect(rect, true);
+    }
+};
+
+int main()
+{
     Graphics::Types::Size size(500, 500);
     Graphics::Window window(size, "Test Window");
     window.set_clear_color(100, 100, 0, 0);
+    auto entity = std::make_unique<MyEntity>();
+    window.register_entity(std::move(entity));
     window.run();
     return 0;
 }

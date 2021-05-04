@@ -1,7 +1,10 @@
 set(SOURCES
         Window.cpp
         Window.h
-
+        Graphics.cpp
+        Graphics.h
+        Entity.cpp
+        Entity.h
         Common.h
         )
 

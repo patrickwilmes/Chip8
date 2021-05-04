@@ -23,9 +23,13 @@
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #pragma once
 #include "Common.h"
+#include "Entity.h"
+#include "Graphics.h"
 #include <Types.h>
 #include <string>
 #include <SDL2/SDL.h>
+#include <vector>
+#include <memory>
 
 namespace Graphics {
     using namespace Common;
@@ -37,16 +41,20 @@ namespace Graphics {
         void run();
         void set_clear_color(Graphics::Types::Color color);
         void set_clear_color(int r, int g, int b, int a);
+        void register_entity(std::unique_ptr<Entity> entity);
     private:
         static void init();
         static SDL_Window * create_window(Graphics::Types::Point position, Graphics::Types::Size size, std::string title);
         static SDL_Renderer * create_renderer(SDL_Window *window);
         static Tuple<int> initialize_screen_info();
+        static std::shared_ptr<Painter> initialize_painter(SDL_Renderer *renderer, Graphics::Types::Color clear_color);
     private:
         SDL_Window *m_window = nullptr;
         SDL_Renderer *m_renderer = nullptr;
         int m_screen_width;
         int m_screen_height;
         Graphics::Types::Color m_clear_color = {.r = 0, .g = 0, .b = 0, .a = 0};
+        std::shared_ptr<Painter> m_painter = nullptr;
+        std::vector<std::unique_ptr<Graphics::Entity>> m_entities;
     };
 }

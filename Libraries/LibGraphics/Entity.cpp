@@ -21,65 +21,9 @@
 // CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-#pragma once
-#include <Types.h>
+#include "Entity.h"
 
-namespace Graphics::Types {
-    typedef Common::Tuple<int> Point;
-    typedef Common::Tuple<int> Size;
-
-    typedef struct {
-        int r, g, b, a;
-    } Color;
-
-    template<typename Type>
-    class Rectangle final {
-    public:
-        Rectangle(Color color, Type x, Type y, Type width, Type height)
-            : m_color(color)
-            , m_x(x)
-            , m_y(y)
-            , m_width(width)
-            , m_height(height)
-        {
-        }
-
-        Type get_x()
-        {
-            return m_x;
-        }
-        Type get_y()
-        {
-            return m_y;
-        }
-        Type get_width()
-        {
-            return m_width;
-        }
-        Type get_height()
-        {
-            return m_height;
-        }
-        int get_r()
-        {
-            return m_color.r;
-        }
-        int get_g()
-        {
-            return m_color.g;
-        }
-        int get_b()
-        {
-            return m_color.b;
-        }
-        int get_a()
-        {
-            return m_color.a;
-        }
-
-    private:
-        Color m_color;
-        Type m_x, m_y, m_width, m_height;
-    };
-
+void Graphics::Entity::draw(const std::shared_ptr<Painter>& painter)
+{
+    draw_component(painter);
 }

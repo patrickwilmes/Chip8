@@ -21,65 +21,29 @@
 // CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-#pragma once
-#include <Types.h>
+#include "Graphics.h"
 
-namespace Graphics::Types {
-    typedef Common::Tuple<int> Point;
-    typedef Common::Tuple<int> Size;
+Graphics::Painter::Painter(SDL_Renderer* renderer, Graphics::Types::Color clear_color)
+    : m_clear_color(clear_color), m_renderer(renderer)
+{
+}
 
-    typedef struct {
-        int r, g, b, a;
-    } Color;
-
-    template<typename Type>
-    class Rectangle final {
-    public:
-        Rectangle(Color color, Type x, Type y, Type width, Type height)
-            : m_color(color)
-            , m_x(x)
-            , m_y(y)
-            , m_width(width)
-            , m_height(height)
-        {
-        }
-
-        Type get_x()
-        {
-            return m_x;
-        }
-        Type get_y()
-        {
-            return m_y;
-        }
-        Type get_width()
-        {
-            return m_width;
-        }
-        Type get_height()
-        {
-            return m_height;
-        }
-        int get_r()
-        {
-            return m_color.r;
-        }
-        int get_g()
-        {
-            return m_color.g;
-        }
-        int get_b()
-        {
-            return m_color.b;
-        }
-        int get_a()
-        {
-            return m_color.a;
-        }
-
-    private:
-        Color m_color;
-        Type m_x, m_y, m_width, m_height;
+void Graphics::Painter::draw_rect(Graphics::Types::Rectangle<int>& rect, bool fill)
+{
+    SDL_Rect sdl_rect = {
+        .x = rect.get_x(),
+        .y = rect.get_y(),
+        .w = rect.get_width(),
+        .h = rect.get_height()
     };
+    SDL_SetRenderDrawColor(m_renderer, rect.get_r(), rect.get_g(), rect.get_b(), rect.get_a());
+    if (fill)
+        SDL_RenderFillRect(m_renderer, &sdl_rect);
+    else
+        SDL_RenderDrawRect(m_renderer, &sdl_rect);
+}
 
+void Graphics::Painter::reset_draw_color()
+{
+    SDL_SetRenderDrawColor(m_renderer, m_clear_color.r, m_clear_color.g, m_clear_color.b, m_clear_color.a);
 }
