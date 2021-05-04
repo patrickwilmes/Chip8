@@ -1,0 +1,3 @@
+
+add_executable(GraphicsSandbox graphics.cpp)
+target_link_libraries(GraphicsSandbox LibGraphics)
