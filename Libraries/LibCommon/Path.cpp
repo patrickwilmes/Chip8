@@ -21,12 +21,35 @@
 // CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-#include <Window.h>
+#include "Path.h"
+#include "User.h"
+#include <Print.h>
 
-int main() {
-    Graphics::Types::Size size(500, 500);
-    Graphics::Window window(size, "Test Window");
-    window.set_clear_color(100, 100, 0, 0);
-    window.run();
-    return 0;
+std::string Common::resolve_relative_path(std::string path)
+{
+    char first_char = path[0];
+    // if we start not with ~ or we start with / then we are not relative
+    if (first_char != '~' && first_char != '/') {
+        return path;
+    }
+    if (first_char == '~') {
+        auto user = Common::get_user_info();
+        auto home_dir = user.home_dir;
+        return path.replace(0, 1, user.home_dir);
+    } else {
+    }
+    return "";
+}
+
+std::string Common::concat_path(std::string path_one, std::string path_two)
+{
+    char last_char_path_one = path_one[path_one.length() - 1];
+    char first_char_path_two = path_two[0];
+    if ((last_char_path_one == '/' && first_char_path_two != '/') || (last_char_path_one != '/' && first_char_path_two == '/')) {
+        return path_one + path_two;
+    }
+    if (last_char_path_one == '/') {
+        return path_one.erase(path_one.length() - 1) + path_two;
+    }
+    return path_one + "/" + path_two;
 }

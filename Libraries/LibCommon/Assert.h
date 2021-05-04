@@ -21,12 +21,36 @@
 // CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-#include <Window.h>
+#pragma once
 
-int main() {
-    Graphics::Types::Size size(500, 500);
-    Graphics::Window window(size, "Test Window");
-    window.set_clear_color(100, 100, 0, 0);
-    window.run();
-    return 0;
+#include "Print.h"
+#include <cassert>
+#include <string>
+
+namespace Common {
+    static inline void NOT_IMPLEMENTED(const std::string& msg)
+    {
+        err("Not Implemented: ", msg);
+        assert(false);
+    }
+
+    static inline void FAIL(const std::string& reason)
+    {
+        err("ERROR: ", reason);
+        throw std::runtime_error(reason);
+    }
+
+    static inline void ASSERT(bool condition, const std::string& msg)
+    {
+        if (!condition) {
+            FAIL(msg);
+        }
+    }
+
+    static inline void FAIL_IF_ERROR(int error, const std::string& msg)
+    {
+        if (error != 0) {
+            FAIL(msg);
+        }
+    }
 }

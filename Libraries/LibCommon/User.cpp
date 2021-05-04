@@ -21,12 +21,27 @@
 // CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-#include <Window.h>
+#include "User.h"
+#include <climits>
+#include <pwd.h>
+#include <unistd.h>
 
-int main() {
-    Graphics::Types::Size size(500, 500);
-    Graphics::Window window(size, "Test Window");
-    window.set_clear_color(100, 100, 0, 0);
-    window.run();
-    return 0;
+std::string Common::current_working_dir()
+{
+    char cwd[PATH_MAX];
+    if (getcwd(cwd, sizeof(cwd)) != nullptr) {
+        return std::string(cwd);
+    }
+    return ""; //TODO: dont just fail, say something
+}
+
+Common::User Common::get_user_info()
+{
+    char* username = getlogin();
+    struct passwd* pw = getpwuid(getuid());
+    User user = {
+        .username = std::string(username),
+        .home_dir = std::string(pw->pw_dir)
+    };
+    return user;
 }

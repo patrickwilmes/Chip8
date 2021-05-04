@@ -21,12 +21,4 @@
 // CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-#include <Window.h>
-
-int main() {
-    Graphics::Types::Size size(500, 500);
-    Graphics::Window window(size, "Test Window");
-    window.set_clear_color(100, 100, 0, 0);
-    window.run();
-    return 0;
-}
+#include "Assert.h"

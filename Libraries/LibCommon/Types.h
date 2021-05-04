@@ -21,12 +21,37 @@
 // CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-#include <Window.h>
+#pragma once
+#include <cstdint>
 
-int main() {
-    Graphics::Types::Size size(500, 500);
-    Graphics::Window window(size, "Test Window");
-    window.set_clear_color(100, 100, 0, 0);
-    window.run();
-    return 0;
+namespace Common {
+    typedef uint64_t u64;
+    typedef uint32_t u32;
+    typedef uint16_t u16;
+    typedef uint8_t u8;
+
+    constexpr int EXIT_FAIL = -1;
+    constexpr int EXIT_SUCC = 0;
+
+    template<typename Type>
+    class Tuple final {
+    public:
+        Tuple(Type first, Type second)
+            : m_first(first)
+            , m_second(second)
+        {
+        }
+        Type get_first()
+        {
+            return m_first;
+        }
+        Type get_second()
+        {
+            return m_second;
+        }
+
+    private:
+        Type m_first;
+        Type m_second;
+    };
 }

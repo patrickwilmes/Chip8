@@ -21,12 +21,32 @@
 // CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-#include <Window.h>
+#pragma once
 
-int main() {
-    Graphics::Types::Size size(500, 500);
-    Graphics::Window window(size, "Test Window");
-    window.set_clear_color(100, 100, 0, 0);
-    window.run();
-    return 0;
+#include <iostream>
+
+namespace Common {
+    template<typename T>
+    void msg(T val) {
+        std::cout << val << std::flush;
+    }
+
+    template<typename First, typename ...T>
+    void msg(First f, T ...args) {
+        msg(f);
+        msg(args...);
+        std::cout << '\n' << std::flush;
+    }
+
+    template<typename T>
+    void err(T val) {
+        std::cerr << val << std::flush;
+    }
+
+    template<typename First, typename ...T>
+    void err(First f, T ...args) {
+        err(f);
+        err(args...);
+        std::cerr << '\n' << std::flush;
+    }
 }

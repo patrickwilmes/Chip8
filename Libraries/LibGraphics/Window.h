@@ -21,12 +21,32 @@
 // CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-#include <Window.h>
+#pragma once
+#include "Common.h"
+#include <Types.h>
+#include <string>
+#include <SDL2/SDL.h>
 
-int main() {
-    Graphics::Types::Size size(500, 500);
-    Graphics::Window window(size, "Test Window");
-    window.set_clear_color(100, 100, 0, 0);
-    window.run();
-    return 0;
+namespace Graphics {
+    using namespace Common;
+    class Window {
+    public:
+        Window(Graphics::Types::Size size, std::string title);
+        Window(Graphics::Types::Point position, Graphics::Types::Size size, std::string title);
+        ~Window();
+        void run();
+        void set_clear_color(Graphics::Types::Color color);
+        void set_clear_color(int r, int g, int b, int a);
+    private:
+        static void init();
+        static SDL_Window * create_window(Graphics::Types::Point position, Graphics::Types::Size size, std::string title);
+        static SDL_Renderer * create_renderer(SDL_Window *window);
+        static Tuple<int> initialize_screen_info();
+    private:
+        SDL_Window *m_window = nullptr;
+        SDL_Renderer *m_renderer = nullptr;
+        int m_screen_width;
+        int m_screen_height;
+        Graphics::Types::Color m_clear_color = {.r = 0, .g = 0, .b = 0, .a = 0};
+    };
 }
