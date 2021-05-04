@@ -25,13 +25,23 @@
 #include <Window.h>
 #include <memory>
 
-class MyEntity : public Graphics::Entity {
+class MyRect : public Graphics::Entity {
 protected:
     void draw_component(std::shared_ptr<Graphics::Painter> painter) override
     {
         Graphics::Types::Color color = { .r = 100, .g = 0, .b = 0, .a = 0 };
-        Graphics::Types::Rectangle<int> rect(color, 0, 0, 100, 150);
+        Graphics::Types::Rectangle<int> rect(color, 200, 200, 100, 150);
         painter->draw_rect(rect, true);
+    }
+};
+
+class MySquare : public Graphics::Entity {
+protected:
+    void draw_component(std::shared_ptr<Graphics::Painter> painter) override
+    {
+        Graphics::Types::Color color = { .r = 100, .g = 0, .b = 0, .a = 0 };
+        Graphics::Types::Square<int> rect(color, 0, 0, 100);
+        painter->draw_square(rect, true);
     }
 };
 
@@ -40,8 +50,10 @@ int main()
     Graphics::Types::Size size(500, 500);
     Graphics::Window window(size, "Test Window");
     window.set_clear_color(100, 100, 0, 0);
-    auto entity = std::make_unique<MyEntity>();
-    window.register_entity(std::move(entity));
+    auto square = std::make_unique<MySquare>();
+    auto rect = std::make_unique<MyRect>();
+    window.register_entity(std::move(square));
+    window.register_entity(std::move(rect));
     window.run();
     return 0;
 }

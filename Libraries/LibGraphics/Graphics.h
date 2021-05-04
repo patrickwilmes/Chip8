@@ -30,6 +30,7 @@ namespace Graphics {
     public:
         Painter(SDL_Renderer *renderer, Graphics::Types::Color clear_color);
         void draw_rect(Graphics::Types::Rectangle<int>& rect, bool fill = false);
+        void draw_square(Graphics::Types::Square<int>& rect, bool fill = false);
     private:
         void reset_draw_color();
     private:

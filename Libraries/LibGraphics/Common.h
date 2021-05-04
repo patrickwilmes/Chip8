@@ -33,7 +33,7 @@ namespace Graphics::Types {
     } Color;
 
     template<typename Type>
-    class Rectangle final {
+    class Rectangle {
     public:
         Rectangle(Color color, Type x, Type y, Type width, Type height)
             : m_color(color)
@@ -80,6 +80,15 @@ namespace Graphics::Types {
     private:
         Color m_color;
         Type m_x, m_y, m_width, m_height;
+    };
+
+    template<typename Type>
+    class Square : public Rectangle<Type> {
+    public:
+        Square(Color color, Type x, Type y, Type width)
+            : Rectangle<Type>(color, x, y, width, width)
+        {
+        }
     };
 
 }

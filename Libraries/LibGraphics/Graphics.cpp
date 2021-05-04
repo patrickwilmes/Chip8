@@ -24,7 +24,8 @@
 #include "Graphics.h"
 
 Graphics::Painter::Painter(SDL_Renderer* renderer, Graphics::Types::Color clear_color)
-    : m_clear_color(clear_color), m_renderer(renderer)
+    : m_clear_color(clear_color)
+    , m_renderer(renderer)
 {
 }
 
@@ -46,4 +47,9 @@ void Graphics::Painter::draw_rect(Graphics::Types::Rectangle<int>& rect, bool fi
 void Graphics::Painter::reset_draw_color()
 {
     SDL_SetRenderDrawColor(m_renderer, m_clear_color.r, m_clear_color.g, m_clear_color.b, m_clear_color.a);
+}
+
+void Graphics::Painter::draw_square(Graphics::Types::Square<int>& rect, bool fill)
+{
+    draw_rect(rect, fill);
 }
