@@ -1,4 +1,10 @@
 set(SOURCES
+        Chip8.cpp
+        Chip8.h
+        Memory.cpp
+        Memory.h
+        Display.cpp
+        Display.h
         main.cpp
         )
 
