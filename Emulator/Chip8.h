@@ -22,7 +22,18 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #pragma once
+#include "Cpu.h"
+#include "Display.h"
+#include <string>
+#include <memory>
 
 namespace Chip8 {
-
+    class Interpreter final {
+    public:
+        Interpreter();
+        void emulate(const std::string& source_file);
+    private:
+        std::unique_ptr<Display> m_display = nullptr;
+        std::unique_ptr<Cpu> m_cpu = nullptr;
+    };
 }

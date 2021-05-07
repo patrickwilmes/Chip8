@@ -22,3 +22,13 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Chip8.h"
+
+Chip8::Interpreter::Interpreter()
+{
+    m_display = std::make_unique<Display>();
+    m_cpu = std::make_unique<Cpu>();
+}
+
+void Chip8::Interpreter::emulate(const std::string& source_file)
+{
+}

@@ -23,10 +23,16 @@
 // CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
+#include "Chip8.h"
 #include <iostream>
 
-int main()
+int main(int argc, char **argv)
 {
-    std::cout << "test" << std::endl;
+    if (argc != 2) {
+        return -1; //TODO: do proper error handling here
+    }
+    std::string source_file = argv[1];
+    Chip8::Interpreter interpreter;
+    interpreter.emulate(source_file);
     return 0;
 }
