@@ -29,8 +29,12 @@ namespace Chip8 {
     class MemoryManager final {
     public:
         MemoryManager();
+        void place_program(char* data, int size);
+        void dump();
+
     private:
         void reset_memory();
+
     private:
         static constexpr u32 MEMORY_SIZE = 1 << 12;
         char m_memory[MEMORY_SIZE];

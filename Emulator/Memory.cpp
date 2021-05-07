@@ -22,6 +22,8 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Memory.h"
+#include <cstddef>
+#include <iostream>
 
 Chip8::MemoryManager::MemoryManager()
 {
@@ -30,7 +32,28 @@ Chip8::MemoryManager::MemoryManager()
 
 void Chip8::MemoryManager::reset_memory()
 {
-    for (char & i : m_memory) {
+    for (char& i : m_memory) {
         i = 0;
+    }
+}
+
+void Chip8::MemoryManager::place_program(char* data, int size)
+{
+    int program_ptr = 0x200;
+    for (size_t i = 0; i < size; i++) {
+        m_memory[program_ptr] = data[i];
+        program_ptr++;
+    }
+}
+
+void Chip8::MemoryManager::dump()
+{
+    const size_t ROW_SIZE = 1 << 2;
+    for (size_t i = 0; i < MEMORY_SIZE; i++) {
+        if (i % ROW_SIZE == 0) {
+            std::cout << '\n'
+                      << std::flush;
+        }
+        std::cout << int_to_hex((int)m_memory[i]) << " ";
     }
 }

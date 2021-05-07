@@ -23,6 +23,8 @@
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #pragma once
 #include <cstdint>
+#include <string>
+#include <iomanip>
 
 namespace Common {
     typedef uint64_t u64;
@@ -32,6 +34,16 @@ namespace Common {
 
     constexpr int EXIT_FAIL = -1;
     constexpr int EXIT_SUCC = 0;
+
+    template<typename T>
+    inline std::string int_to_hex(T i)
+    {
+        std::stringstream stream;
+        stream << "0x"
+               << std::setfill('0') << std::setw(sizeof(T) * 2)
+               << std::hex << i;
+        return stream.str();
+    }
 
     template<typename Type>
     class Tuple final {

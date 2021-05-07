@@ -22,3 +22,36 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Cpu.h"
+#include <Types.h>
+#include <iostream>
+#include <utility>
+
+Chip8::Cpu::Cpu(std::shared_ptr<MemoryManager> memory_manager)
+    : m_memory_manager(std::move(memory_manager))
+{
+}
+
+void Chip8::Cpu::dump()
+{
+    const size_t ROW_SIZE = 1 << 2;
+    for (size_t i = 0; i < 16; i++) {
+        if (i % ROW_SIZE == 0) {
+            std::cout << '\n'
+                      << std::flush;
+        }
+        std::cout << Common::int_to_hex((int)m_registers[i]) << " ";
+    }
+    std::cout << '\n';
+    std::cout << "ADDRESS REGISER: ";
+    std::cout << Common::int_to_hex((int)m_address_register) << "\n";
+}
+
+void Chip8::Cpu::core_dump()
+{
+    std::cout << "================REGISTER DUMP================" << '\n' << std::flush;
+    dump();
+    std::cout << "\n=============================================" << '\n' << std::flush;
+    std::cout << "=================MEMORY DUMP=================" << '\n' << std::flush;
+    m_memory_manager->dump();
+    std::cout << "\n=============================================" << '\n' << std::flush;
+}

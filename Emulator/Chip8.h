@@ -33,6 +33,9 @@ namespace Chip8 {
         Interpreter();
         void emulate(const std::string& source_file);
     private:
+        void load_program(const std::string& source_file);
+    private:
+        std::shared_ptr<MemoryManager> m_memory_manager = nullptr;
         std::unique_ptr<Display> m_display = nullptr;
         std::unique_ptr<Cpu> m_cpu = nullptr;
     };

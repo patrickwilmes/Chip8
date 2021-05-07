@@ -28,8 +28,12 @@
 namespace Chip8 {
     class Cpu final {
     public:
+        explicit Cpu(std::shared_ptr<MemoryManager> memory_manager);
+        void dump();
+        void core_dump();
+
     private:
-        std::unique_ptr<MemoryManager> m_memory_manager;
+        std::shared_ptr<MemoryManager> m_memory_manager;
         enum {
             V0 = 0,
             V1,
@@ -47,7 +51,7 @@ namespace Chip8 {
             VD,
             VF
         };
-        char m_registers[16];
-        short int m_address_register;
+        char m_registers[16]{};
+        short int m_address_register{};
     };
 }

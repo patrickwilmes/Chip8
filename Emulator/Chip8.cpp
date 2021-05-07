@@ -22,13 +22,25 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Chip8.h"
+#include <cstdio>
 
 Chip8::Interpreter::Interpreter()
 {
+    m_memory_manager = std::make_shared<MemoryManager>();
     m_display = std::make_unique<Display>();
-    m_cpu = std::make_unique<Cpu>();
+    m_cpu = std::make_unique<Cpu>(m_memory_manager);
 }
 
 void Chip8::Interpreter::emulate(const std::string& source_file)
 {
+    load_program(source_file);
+}
+
+void Chip8::Interpreter::load_program(const std::string& source_file)
+{
+    char buffer[1<<12];
+    FILE * file = fopen(source_file.c_str(), "rb");
+    int bytes_read = fread(buffer, sizeof(char), 1<<12, file);
+    m_memory_manager->place_program(buffer, bytes_read);
+    m_cpu->core_dump();
 }
