@@ -34,6 +34,7 @@ Chip8::Interpreter::Interpreter()
 void Chip8::Interpreter::emulate(const std::string& source_file)
 {
     load_program(source_file);
+    m_cpu->execute();
 }
 
 void Chip8::Interpreter::load_program(const std::string& source_file)
@@ -42,5 +43,5 @@ void Chip8::Interpreter::load_program(const std::string& source_file)
     FILE * file = fopen(source_file.c_str(), "rb");
     int bytes_read = fread(buffer, sizeof(char), 1<<12, file);
     m_memory_manager->place_program(buffer, bytes_read);
-    m_cpu->core_dump();
+//    m_cpu->core_dump();
 }

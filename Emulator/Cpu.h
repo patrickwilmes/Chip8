@@ -31,6 +31,7 @@ namespace Chip8 {
         explicit Cpu(std::shared_ptr<MemoryManager> memory_manager);
         void dump();
         void core_dump();
+        void execute();
 
     private:
         std::shared_ptr<MemoryManager> m_memory_manager;
@@ -53,5 +54,6 @@ namespace Chip8 {
         };
         char m_registers[16]{};
         short int m_address_register{};
+        u32 m_program_counter = 0x200;
     };
 }

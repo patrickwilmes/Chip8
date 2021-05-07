@@ -48,10 +48,44 @@ void Chip8::Cpu::dump()
 
 void Chip8::Cpu::core_dump()
 {
-    std::cout << "================REGISTER DUMP================" << '\n' << std::flush;
+    std::cout << "================REGISTER DUMP================" << '\n'
+              << std::flush;
     dump();
-    std::cout << "\n=============================================" << '\n' << std::flush;
-    std::cout << "=================MEMORY DUMP=================" << '\n' << std::flush;
+    std::cout << "\n=============================================" << '\n'
+              << std::flush;
+    std::cout << "=================MEMORY DUMP=================" << '\n'
+              << std::flush;
     m_memory_manager->dump();
-    std::cout << "\n=============================================" << '\n' << std::flush;
+    std::cout << "\n=============================================" << '\n'
+              << std::flush;
+}
+
+void Chip8::Cpu::execute()
+{
+    int i = 0;
+    while (i < 10) {
+        char op_code = m_memory_manager->get_at_position(m_program_counter);
+        switch (op_code >> 4) {
+        case 0x6: {
+            int target_register = op_code >> 8;
+            m_program_counter++;
+            char addr = m_memory_manager->get_at_position(m_program_counter);
+            m_registers[target_register] = addr;
+            m_program_counter++;
+            break;
+        }
+        case 0xF: {
+            int target_register = op_code >> 8;
+            char addr = m_memory_manager->get_at_position(m_program_counter);
+            if (addr == 0x07) {
+                int value = m_registers[target_register];
+                std::cout << "Me timer @ " << value << std::endl;
+            }
+            break;
+        }
+        }
+        i++;
+    }
+    dump();
+    //    core_dump();
 }

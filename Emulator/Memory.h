@@ -31,9 +31,11 @@ namespace Chip8 {
         MemoryManager();
         void place_program(char* data, int size);
         void dump();
+        char get_at_position(u32 position);
 
     private:
         void reset_memory();
+        void ensure_non_protected_access(u32 position);
 
     private:
         static constexpr u32 MEMORY_SIZE = 1 << 12;

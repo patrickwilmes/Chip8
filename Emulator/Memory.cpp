@@ -24,6 +24,9 @@
 #include "Memory.h"
 #include <cstddef>
 #include <iostream>
+#include <Assert.h>
+
+using namespace Common;
 
 Chip8::MemoryManager::MemoryManager()
 {
@@ -56,4 +59,16 @@ void Chip8::MemoryManager::dump()
         }
         std::cout << int_to_hex((int)m_memory[i]) << " ";
     }
+}
+
+char Chip8::MemoryManager::get_at_position(const u32 position)
+{
+    ensure_non_protected_access(position);
+    return m_memory[position];
+}
+
+void Chip8::MemoryManager::ensure_non_protected_access(const u32 position)
+{
+    ASSERT(position >= 0x200, "Access below 0x200 no allowed!");
+    ASSERT(position < 0xF00, "Access above 0xF00 not allowed!");
 }
