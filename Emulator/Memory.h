@@ -22,7 +22,18 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #pragma once
+#include <Types.h>
 
 namespace Chip8 {
+    using namespace Common;
+    class MemoryManager final {
+    public:
+        MemoryManager();
+    private:
+        void reset_memory();
+    private:
+        static constexpr u32 MEMORY_SIZE = 1 << 12;
+        char m_memory[MEMORY_SIZE];
+    };
 
 }

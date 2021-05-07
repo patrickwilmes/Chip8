@@ -22,3 +22,15 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Memory.h"
+
+Chip8::MemoryManager::MemoryManager()
+{
+    reset_memory();
+}
+
+void Chip8::MemoryManager::reset_memory()
+{
+    for (char & i : m_memory) {
+        i = 0;
+    }
+}
