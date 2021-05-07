@@ -22,3 +22,16 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Display.h"
+#include <cstddef>
+
+void Chip8::Display::apply_display_data(const unsigned short* new_display_data)
+{
+    for (size_t i = 0; i < 32 * 64; i++) {
+        unsigned short current_value = m_display_data[i];
+        unsigned short new_value = new_display_data[i];
+
+        unsigned short ored = current_value | new_value;
+        unsigned short neg_ored = ~current_value | ~new_value;
+        m_display_data[i] = ored & neg_ored;
+    }
+}

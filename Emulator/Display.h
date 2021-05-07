@@ -24,5 +24,10 @@
 #pragma once
 
 namespace Chip8 {
-
+    class Display final {
+    public:
+        void apply_display_data(const unsigned short new_display_data[32*64]);
+    private:
+        unsigned short m_display_data[32*64];
+    };
 }
