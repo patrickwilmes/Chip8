@@ -5,6 +5,8 @@ set(SOURCES
         Memory.h
         Display.cpp
         Display.h
+        Cpu.cpp
+        Cpu.h
         main.cpp
         )
 
