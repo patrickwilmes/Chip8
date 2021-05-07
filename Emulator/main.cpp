@@ -24,12 +24,14 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 #include "Chip8.h"
+#include <Print.h>
 #include <iostream>
 
 int main(int argc, char **argv)
 {
     if (argc != 2) {
-        return -1; //TODO: do proper error handling here
+        Common::err("Usage: ./chip8 <SOURCE_FILE>\n");
+        return -1;
     }
     std::string source_file = argv[1];
     Chip8::Interpreter interpreter;
