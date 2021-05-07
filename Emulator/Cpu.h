@@ -52,7 +52,7 @@ namespace Chip8 {
             VD,
             VF
         };
-        char m_registers[16]{};
+        unsigned char m_registers[16]{};
         short int m_address_register{};
         u32 m_program_counter = 0x200;
     };

@@ -29,9 +29,9 @@ namespace Chip8 {
     class MemoryManager final {
     public:
         MemoryManager();
-        void place_program(char* data, int size);
+        void place_program(unsigned char* data, int size);
         void dump();
-        char get_at_position(u32 position);
+        unsigned short get_at_position(u32 position);
 
     private:
         void reset_memory();
@@ -39,7 +39,7 @@ namespace Chip8 {
 
     private:
         static constexpr u32 MEMORY_SIZE = 1 << 12;
-        char m_memory[MEMORY_SIZE];
+        unsigned char m_memory[MEMORY_SIZE];
     };
 
 }

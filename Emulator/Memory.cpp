@@ -22,9 +22,9 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Memory.h"
+#include <Assert.h>
 #include <cstddef>
 #include <iostream>
-#include <Assert.h>
 
 using namespace Common;
 
@@ -35,12 +35,12 @@ Chip8::MemoryManager::MemoryManager()
 
 void Chip8::MemoryManager::reset_memory()
 {
-    for (char& i : m_memory) {
+    for (unsigned char& i : m_memory) {
         i = 0;
     }
 }
 
-void Chip8::MemoryManager::place_program(char* data, int size)
+void Chip8::MemoryManager::place_program(unsigned char* data, int size)
 {
     int program_ptr = 0x200;
     for (size_t i = 0; i < size; i++) {
@@ -61,10 +61,15 @@ void Chip8::MemoryManager::dump()
     }
 }
 
-char Chip8::MemoryManager::get_at_position(const u32 position)
+unsigned short Chip8::MemoryManager::get_at_position(const u32 position)
 {
     ensure_non_protected_access(position);
-    return m_memory[position];
+    ensure_non_protected_access(position + 1);
+
+//    std::cout << "PC:: " << position << std::endl;
+//    std::cout << "MEM[0]:: " << int_to_hex(m_memory[position]) << " MEM[1]:: " << int_to_hex(m_memory[position+1])<< std::endl;
+//    std::cout << "MEM:: " << int_to_hex(m_memory[position] << 8 | m_memory[position + 1]) << std::endl;
+    return m_memory[position] << 8 | m_memory[position + 1];
 }
 
 void Chip8::MemoryManager::ensure_non_protected_access(const u32 position)

@@ -39,7 +39,7 @@ void Chip8::Interpreter::emulate(const std::string& source_file)
 
 void Chip8::Interpreter::load_program(const std::string& source_file)
 {
-    char buffer[1<<12];
+    unsigned char buffer[1<<12];
     FILE * file = fopen(source_file.c_str(), "rb");
     int bytes_read = fread(buffer, sizeof(char), 1<<12, file);
     m_memory_manager->place_program(buffer, bytes_read);

@@ -64,28 +64,17 @@ void Chip8::Cpu::execute()
 {
     int i = 0;
     while (i < 10) {
-        char op_code = m_memory_manager->get_at_position(m_program_counter);
-        switch (op_code >> 4) {
-        case 0x6: {
-            int target_register = op_code >> 8;
-            m_program_counter++;
-            char addr = m_memory_manager->get_at_position(m_program_counter);
-            m_registers[target_register] = addr;
-            m_program_counter++;
+        unsigned short op_code = m_memory_manager->get_at_position(m_program_counter);
+        std::cout << int_to_hex(op_code) << std::endl;
+        switch (op_code & 0xF000) {
+        case 0x6000:
+            unsigned short target_register = (op_code & 0x0F00) >> 8;
+            m_registers[target_register] = op_code & 0x00FF;
             break;
         }
-        case 0xF: {
-            int target_register = op_code >> 8;
-            char addr = m_memory_manager->get_at_position(m_program_counter);
-            if (addr == 0x07) {
-                int value = m_registers[target_register];
-                std::cout << "Me timer @ " << value << std::endl;
-            }
-            break;
-        }
-        }
+        m_program_counter += 2;
         i++;
     }
     dump();
-    //    core_dump();
+//        core_dump();
 }
