@@ -24,6 +24,7 @@
 #pragma once
 #include "Cpu.h"
 #include "Display.h"
+#include <Window.h>
 #include <string>
 #include <memory>
 
@@ -38,5 +39,13 @@ namespace Chip8 {
         std::shared_ptr<MemoryManager> m_memory_manager = nullptr;
         std::shared_ptr<Display> m_display = nullptr;
         std::unique_ptr<Cpu> m_cpu = nullptr;
+    };
+
+    class Chip8Application final : public Graphics::Window {
+    public:
+        explicit Chip8Application(Graphics::Types::Size size);
+        void launch(const std::string& file);
+    private:
+        Interpreter m_interpreter;
     };
 }
