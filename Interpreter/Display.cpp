@@ -22,6 +22,8 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Display.h"
+#include <Types.h>
+#include <iostream>
 #include <cstddef>
 
 void Chip8::Display::apply_display_data(const unsigned short* new_display_data)
@@ -40,5 +42,16 @@ void Chip8::Display::clear()
 {
     for(auto& data : m_display_data) {
         data = 0;
+    }
+}
+
+void Chip8::Display::dump()
+{
+    const size_t ROW_SIZE = 1 << 6;
+    for (size_t i = 0; i < 32 * 64; i++) {
+        if (i % ROW_SIZE == 0) {
+            std::cout << '\n' << std::flush;
+        }
+        std::cout << Common::int_to_hex((int)m_display_data[i]) << " ";
     }
 }

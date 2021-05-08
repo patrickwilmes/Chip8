@@ -59,6 +59,11 @@ void Chip8::Cpu::core_dump()
     m_memory_manager->dump();
     std::cout << "\n=============================================" << '\n'
               << std::flush;
+    std::cout << "==================Display Dump=================" << '\n'
+              << std::flush;
+    m_display->dump();
+    std::cout << "\n=============================================" << '\n'
+              << std::flush;
 }
 
 void Chip8::Cpu::execute()
@@ -74,8 +79,7 @@ void Chip8::Cpu::execute()
                 m_display->clear();
             } else if (last_byte == 0xEE) {
                 //TODO: return from subroutine
-            }
-            else {
+            } else {
                 //TODO: call machine code routine at address NNN.
             }
             break;
@@ -146,6 +150,6 @@ void Chip8::Cpu::execute()
         m_program_counter += 2;
         should_quit = m_memory_manager->is_program_end(m_program_counter);
     }
-    dump();
-    //        core_dump();
+//    dump();
+            core_dump();
 }
