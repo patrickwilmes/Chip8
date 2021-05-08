@@ -57,5 +57,6 @@ namespace Chip8 {
         unsigned char m_registers[16] {};
         short int m_address_register {};
         u32 m_program_counter = 0x200;
+        u32 m_program_counter_backup = m_program_counter;
     };
 }

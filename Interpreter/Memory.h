@@ -32,7 +32,7 @@ namespace Chip8 {
         void place_program(unsigned char* data, int size);
         void dump();
         unsigned short get_at_position(u32 position);
-
+        bool is_program_end(u32 position);
     private:
         void reset_memory();
         void ensure_non_protected_access(u32 position);
