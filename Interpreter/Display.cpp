@@ -35,3 +35,10 @@ void Chip8::Display::apply_display_data(const unsigned short* new_display_data)
         m_display_data[i] = ored & neg_ored;
     }
 }
+
+void Chip8::Display::clear()
+{
+    for(auto& data : m_display_data) {
+        data = 0;
+    }
+}

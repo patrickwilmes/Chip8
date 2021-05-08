@@ -27,8 +27,8 @@
 Chip8::Interpreter::Interpreter()
 {
     m_memory_manager = std::make_shared<MemoryManager>();
-    m_display = std::make_unique<Display>();
-    m_cpu = std::make_unique<Cpu>(m_memory_manager);
+    m_display = std::make_shared<Display>();
+    m_cpu = std::make_unique<Cpu>(m_memory_manager, m_display);
 }
 
 void Chip8::Interpreter::emulate(const std::string& source_file)

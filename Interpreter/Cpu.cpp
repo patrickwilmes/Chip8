@@ -26,8 +26,9 @@
 #include <iostream>
 #include <utility>
 
-Chip8::Cpu::Cpu(std::shared_ptr<MemoryManager> memory_manager)
+Chip8::Cpu::Cpu(std::shared_ptr<MemoryManager> memory_manager, std::shared_ptr<Display> display)
     : m_memory_manager(std::move(memory_manager))
+    , m_display(std::move(display))
 {
 }
 
@@ -67,14 +68,19 @@ void Chip8::Cpu::execute()
         unsigned short op_code = m_memory_manager->get_at_position(m_program_counter);
         std::cout << int_to_hex(op_code) << std::endl;
         switch (op_code & 0xF000) {
-        case 0x6000:
+        case 0x6000: {
             unsigned short target_register = (op_code & 0x0F00) >> 8;
             m_registers[target_register] = op_code & 0x00FF;
             break;
+        }
+        case 0x0000: {
+            m_display->clear();
+            break;
+        }
         }
         m_program_counter += 2;
         i++;
     }
     dump();
-//        core_dump();
+    //        core_dump();
 }
