@@ -10,5 +10,5 @@ set(SOURCES
         main.cpp
         )
 
-add_executable(Emulator ${SOURCES})
-target_link_libraries(Emulator LibGraphics)
+add_executable(Chip8 ${SOURCES})
+target_link_libraries(Chip8 LibGraphics)
