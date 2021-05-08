@@ -66,9 +66,6 @@ unsigned short Chip8::MemoryManager::get_at_position(const u32 position)
     ensure_non_protected_access(position);
     ensure_non_protected_access(position + 1);
 
-//    std::cout << "PC:: " << position << std::endl;
-//    std::cout << "MEM[0]:: " << int_to_hex(m_memory[position]) << " MEM[1]:: " << int_to_hex(m_memory[position+1])<< std::endl;
-//    std::cout << "MEM:: " << int_to_hex(m_memory[position] << 8 | m_memory[position + 1]) << std::endl;
     return m_memory[position] << 8 | m_memory[position + 1];
 }
 
