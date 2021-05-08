@@ -23,8 +23,11 @@
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Cpu.h"
 #include <Types.h>
+#include <Print.h>
 #include <iostream>
 #include <utility>
+
+using namespace Common;
 
 Chip8::Cpu::Cpu(std::shared_ptr<MemoryManager> memory_manager, std::shared_ptr<Display> display)
     : m_memory_manager(std::move(memory_manager))
@@ -76,6 +79,7 @@ void Chip8::Cpu::execute()
         case 0x0000: {
             unsigned short last_byte = op_code & 0x00FF;
             if (last_byte == 0xE0) {
+                msg("clearing screen\n");
                 m_display->clear();
             } else if (last_byte == 0xEE) {
                 //TODO: return from subroutine
@@ -88,6 +92,7 @@ void Chip8::Cpu::execute()
             unsigned short target_address = op_code & 0x0FFF;
             m_program_counter_backup = m_program_counter;
             m_program_counter = target_address;
+            msg("moving to a different address. from: ", int_to_hex(m_program_counter_backup), " to: ", int_to_hex(m_program_counter));
             break;
         }
         case 0x2000: {
@@ -109,6 +114,7 @@ void Chip8::Cpu::execute()
         case 0x6000: {
             unsigned short target_register = (op_code & 0x0F00) >> 8;
             m_registers[target_register] = op_code & 0x00FF;
+            msg("pushing value into register. register V", int_to_hex(target_register), " value: ", op_code & 0x00FF);
             break;
         }
         case 0x7000: {
@@ -151,5 +157,5 @@ void Chip8::Cpu::execute()
         should_quit = m_memory_manager->is_program_end(m_program_counter);
     }
 //    dump();
-            core_dump();
+//            core_dump();
 }
