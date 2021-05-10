@@ -34,6 +34,11 @@ namespace Chip8 {
         Interpreter();
         void emulate(const std::string& source_file);
         bool execute_next_cycle();
+        //TODO: the following three methods are just delegates and do not really belong here
+        int get_display_width();
+        int get_display_height();
+        unsigned short* get_display_data();
+
     private:
         void load_program(const std::string& source_file);
     private:
