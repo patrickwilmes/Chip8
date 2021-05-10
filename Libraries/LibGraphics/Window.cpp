@@ -25,6 +25,7 @@
 #include <iostream>
 
 Graphics::Window::Window(Graphics::Types::Size size, std::string title)
+    : m_size(size)
 {
     init();
     auto screen_info = initialize_screen_info();
@@ -37,6 +38,7 @@ Graphics::Window::Window(Graphics::Types::Size size, std::string title)
 }
 
 Graphics::Window::Window(Graphics::Types::Point position, Graphics::Types::Size size, std::string title)
+    : m_size(size)
 {
     init();
     m_window = create_window(position, size, std::move(title));
@@ -106,7 +108,7 @@ void Graphics::Window::run()
         SDL_RenderClear(m_renderer);
 
         std::for_each(m_entities.begin(), m_entities.end(), [&](const std::unique_ptr<Entity>& entity) {
-           entity->draw(m_painter);
+            entity->draw(m_painter);
         });
 
         if (!should_quit)
@@ -143,7 +145,7 @@ void Graphics::Window::register_entity(std::unique_ptr<Entity> entity)
 
 void Graphics::Window::update()
 {
-    std::for_each(m_entities.begin(), m_entities.end(), [](const std::unique_ptr<Graphics::Entity>& entity){
+    std::for_each(m_entities.begin(), m_entities.end(), [](const std::unique_ptr<Graphics::Entity>& entity) {
         entity->update();
     });
 }
@@ -155,4 +157,14 @@ void Graphics::Window::update()
 bool Graphics::Window::update_hook()
 {
     return false;
+}
+
+int Graphics::Window::get_window_width()
+{
+    return m_size.get_first();
+}
+
+int Graphics::Window::get_window_height()
+{
+    return m_size.get_second();
 }

@@ -42,6 +42,8 @@ namespace Graphics {
         void set_clear_color(Graphics::Types::Color color);
         void set_clear_color(int r, int g, int b, int a);
         void register_entity(std::unique_ptr<Entity> entity);
+        int get_window_width();
+        int get_window_height();
 
     protected:
         std::vector<std::unique_ptr<Graphics::Entity>> m_entities;
@@ -62,5 +64,6 @@ namespace Graphics {
         int m_screen_height;
         Graphics::Types::Color m_clear_color = { .r = 0, .g = 0, .b = 0, .a = 0 };
         std::shared_ptr<Painter> m_painter = nullptr;
+        Graphics::Types::Size m_size;
     };
 }
