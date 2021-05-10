@@ -255,6 +255,9 @@ bool Chip8::Cpu::execute()
             m_registers[first_register] = m_registers[first_register] << 1;
             break;
         }
+        default:
+            msg("Unknown opcode in 0x6000\n");
+            break;
         }
         break;
     }
@@ -315,5 +318,8 @@ bool Chip8::Cpu::execute()
     if (should_increment_pc)
         m_program_counter += 2;
     should_quit = m_memory_manager->is_program_end(m_program_counter);
+    m_op_code_count++;
+    if (should_quit)
+        std::cout << "OPCODE COUNT: " << m_op_code_count << std::endl;
     return should_quit;
 }

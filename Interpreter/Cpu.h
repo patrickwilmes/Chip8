@@ -58,5 +58,6 @@ namespace Chip8 {
         short int m_address_register {};
         u32 m_program_counter = 0x200;
         u32 m_program_counter_backup = m_program_counter;
+        u32 m_op_code_count = 0;
     };
 }

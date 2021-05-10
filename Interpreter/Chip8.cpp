@@ -28,147 +28,62 @@
 #include <cstdio>
 #include <iostream>
 
-constexpr Graphics::Types::Color PIXEL_ON_COLOR = { .r = 255, .g = 255, .b = 255, .a = 0 };
-constexpr Graphics::Types::Color PIXEL_OFF_COLOR = { .r = 0, .g = 0, .b = 0, .a = 0 };
-
-class Pixel : public Graphics::Entity {
+class Sprite : public Graphics::Entity {
 public:
-    Pixel(Graphics::Types::Rectangle<int> initial_position, int x, int y)
-        : m_rect(initial_position)
-        , m_current_color(PIXEL_OFF_COLOR)
-        , m_x(x)
-        , m_y(y)
+    Sprite(Graphics::Types::Point initial_position, int height, int cell_width)
+        : m_initial_position(initial_position)
+        , m_height(height == 0 ? 1 : height)
+        , m_cell_width(cell_width == 0 ? 10 : cell_width)
     {
     }
+
     void update() override
     {
-    }
-    void toggle_off()
-    {
-        m_current_color = PIXEL_OFF_COLOR;
-    }
-    void toggle_on()
-    {
-        m_current_color = PIXEL_ON_COLOR;
-    }
-    [[nodiscard]] int get_x() const
-    {
-        return m_x;
-    }
-    [[nodiscard]] int get_y() const
-    {
-        return m_y;
     }
 
 protected:
     void draw_component(std::shared_ptr<Graphics::Painter> painter) override
     {
-        m_rect.set_color(m_current_color);
-        painter->draw_rect(m_rect);
+        Graphics::Types::Rectangle<int> rect(
+            COLOR_WHITE,
+            m_initial_position.get_first(),
+            m_initial_position.get_second(),
+            8 * m_cell_width,
+            m_height);
+        painter->draw_rect(rect);
     }
 
 private:
-    Graphics::Types::Rectangle<int> m_rect;
-    Graphics::Types::Color m_current_color;
-    int m_x, m_y;
+    Graphics::Types::Point m_initial_position;
+    int m_height;
+    int m_cell_width;
+    static constexpr Graphics::Types::Color COLOR_WHITE = { .r = 255, .g = 255, .b = 255, .a = 0 };
 };
 
-Chip8::Interpreter::Interpreter()
+Chip8::Chip8Application::Chip8Application(Graphics::Types::Size size)
+    : Graphics::Window(size, "Chip8")
 {
     m_memory_manager = std::make_shared<MemoryManager>();
     m_display = std::make_shared<Display>();
     m_cpu = std::make_unique<Cpu>(m_memory_manager, m_display);
 }
 
-void Chip8::Interpreter::emulate(const std::string& source_file)
-{
-    load_program(source_file);
-}
-
-int Chip8::Interpreter::get_display_width()
-{
-    return m_display->get_width();
-}
-
-int Chip8::Interpreter::get_display_height()
-{
-    return m_display->get_height();
-}
-
-unsigned short* Chip8::Interpreter::get_display_data()
-{
-    return m_display->get_display_data();
-}
-
-void Chip8::Interpreter::load_program(const std::string& source_file)
-{
-    unsigned char buffer[1 << 12];
-    FILE* file = fopen(source_file.c_str(), "rb");
-    int bytes_read = fread(buffer, sizeof(char), 1 << 12, file);
-    m_memory_manager->place_program(buffer, bytes_read);
-}
-
-bool Chip8::Interpreter::execute_next_cycle()
-{
-    return m_cpu->execute();
-}
-
-Chip8::Chip8Application::Chip8Application(Graphics::Types::Size size)
-    : Graphics::Window(size, "Chip8")
-{
-}
-
 void Chip8::Chip8Application::launch(const std::string& file)
 {
-    m_interpreter.emulate(file);
-    auto width = m_interpreter.get_display_width();
-    auto height = m_interpreter.get_display_height();
-    auto window_width = get_window_width();
-    auto window_height = get_window_height();
-    auto cell_height = window_height / height;
-    auto cell_width = window_width / width;
-    int current_row = -1;
-    int current_col = 0;
-    for (size_t i = 0; i < width * height; i++) {
-        if (i % width == 0) {
-            current_col = 0;
-            current_row++;
-        } else {
-            current_col += cell_width;
-        }
-        Graphics::Types::Rectangle<int> rect(PIXEL_OFF_COLOR, current_col, current_row * cell_height, cell_width, cell_height);
-        auto entity = std::make_shared<Pixel>(rect, current_col, current_row * cell_height);
-        register_entity(entity);
-    }
+    load_program(file);
     run();
 }
 
 bool Chip8::Chip8Application::update_hook()
 {
-    bool should_quit = m_interpreter.execute_next_cycle();
-    int display_width = m_interpreter.get_display_width();
-    int display_height = m_interpreter.get_display_height();
-    unsigned short* display_data = m_interpreter.get_display_data();
-    int current_row = -1;
-    int current_col = 0;
-    for (size_t i = 0; i < display_width * display_height; i++) {
-        if (i % display_width) {
-            current_col = 0;
-            current_row++;
-        } else {
-            current_col++;
-        }
-        for (auto& entity : m_entities) {
-            auto e = std::static_pointer_cast<Pixel>(entity);
-            if (current_col == e->get_x() && current_row == e->get_y()) {
-                auto target_bit = display_data[current_row * 64 + current_col];
-                if (target_bit == 1) {
-                    e->toggle_on();
-                } else {
-                    e->toggle_off();
-                }
-            }
-        }
-    }
+    bool should_quit = m_cpu->execute();
     return should_quit;
+}
+
+void Chip8::Chip8Application::load_program(const std::string& source_file)
+{
+    unsigned char buffer[1 << 12];
+    FILE* file = fopen(source_file.c_str(), "rb");
+    int bytes_read = fread(buffer, sizeof(char), 1 << 12, file);
+    m_memory_manager->place_program(buffer, bytes_read);
 }
