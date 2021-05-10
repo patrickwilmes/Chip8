@@ -22,7 +22,31 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Chip8.h"
+#include <Entity.h>
+#include <Graphics.h>
+#include <Types.h>
 #include <cstdio>
+
+constexpr Graphics::Types::Color PIXEL_ON_COLOR = {.r = 255, .g = 255, .b = 255, .a = 0};
+
+class Pixel : public Graphics::Entity {
+public:
+    explicit Pixel(Graphics::Types::Rectangle<int> initial_position)
+        : m_rect(initial_position)
+    {
+    }
+    void update() override
+    {
+    }
+
+protected:
+    void draw_component(std::shared_ptr<Graphics::Painter> painter) override
+    {
+    }
+
+private:
+    Graphics::Types::Rectangle<int> m_rect;
+};
 
 Chip8::Interpreter::Interpreter()
 {
@@ -72,12 +96,22 @@ Chip8::Chip8Application::Chip8Application(Graphics::Types::Size size)
 void Chip8::Chip8Application::launch(const std::string& file)
 {
     m_interpreter.emulate(file);
+    auto width = m_interpreter.get_display_width();
+    auto height = m_interpreter.get_display_height();
+    for (size_t i = 0; i < width * height; i++) {
+        Graphics::Types::Rectangle<int> rect(PIXEL_ON_COLOR, 0, 0, 20, 20);
+        auto entity = std::make_unique<Pixel>(rect);
+        register_entity(std::move(entity));
+    }
     run();
 }
 
 bool Chip8::Chip8Application::update_hook()
 {
     bool should_quit = m_interpreter.execute_next_cycle();
+    int display_width = m_interpreter.get_display_width();
+    int display_height = m_interpreter.get_display_height();
+    unsigned short* display_data = m_interpreter.get_display_data();
     //TODO: this is the place to hookup the display rendering.
     return should_quit;
 }
