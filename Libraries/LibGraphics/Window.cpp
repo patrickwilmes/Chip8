@@ -109,7 +109,8 @@ void Graphics::Window::run()
            entity->draw(m_painter);
         });
 
-        update_hook();
+        if (!should_quit)
+            should_quit = update_hook();
         update();
 
         SDL_RenderPresent(m_renderer);
@@ -151,6 +152,7 @@ void Graphics::Window::update()
  * update_hook is meant for windows that need some kind of special
  * processing hook that's not related to graphics.
  */
-void Graphics::Window::update_hook()
+bool Graphics::Window::update_hook()
 {
+    return false;
 }
