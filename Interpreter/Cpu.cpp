@@ -151,6 +151,11 @@ bool Chip8::Cpu::execute()
         //TODO
         break;
     }
+    default: {
+        std::cerr << "unknown opcode: " << int_to_hex(op_code) << '\n' << std::flush;
+        core_dump();
+        break;
+    }
     }
     m_program_counter += 2;
     should_quit = m_memory_manager->is_program_end(m_program_counter);
