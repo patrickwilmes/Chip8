@@ -255,6 +255,9 @@ bool Chip8::Cpu::execute()
             m_registers[first_register] = m_registers[first_register] << 1;
             break;
         }
+        default:
+            msg("Unknown opcode in 0x6000\n");
+            break;
         }
         break;
     }
