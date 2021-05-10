@@ -107,7 +107,7 @@ void Graphics::Window::run()
         SDL_SetRenderDrawColor(m_renderer, m_clear_color.r, m_clear_color.g, m_clear_color.b, m_clear_color.a);
         SDL_RenderClear(m_renderer);
 
-        std::for_each(m_entities.begin(), m_entities.end(), [&](const std::unique_ptr<Entity>& entity) {
+        std::for_each(m_entities.begin(), m_entities.end(), [&](const std::shared_ptr<Entity>& entity) {
             entity->draw(m_painter);
         });
 
@@ -138,14 +138,14 @@ void Graphics::Window::set_clear_color(int r, int g, int b, int a)
     set_clear_color({ .r = r, .g = g, .b = b, .a = a });
 }
 
-void Graphics::Window::register_entity(std::unique_ptr<Entity> entity)
+void Graphics::Window::register_entity(std::shared_ptr<Entity> entity)
 {
     m_entities.emplace_back(std::move(entity));
 }
 
 void Graphics::Window::update()
 {
-    std::for_each(m_entities.begin(), m_entities.end(), [](const std::unique_ptr<Graphics::Entity>& entity) {
+    std::for_each(m_entities.begin(), m_entities.end(), [](const std::shared_ptr<Graphics::Entity>& entity) {
         entity->update();
     });
 }

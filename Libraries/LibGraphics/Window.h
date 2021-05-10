@@ -41,12 +41,12 @@ namespace Graphics {
         void run();
         void set_clear_color(Graphics::Types::Color color);
         void set_clear_color(int r, int g, int b, int a);
-        void register_entity(std::unique_ptr<Entity> entity);
+        void register_entity(std::shared_ptr<Entity> entity);
         int get_window_width();
         int get_window_height();
 
     protected:
-        std::vector<std::unique_ptr<Graphics::Entity>> m_entities;
+        std::vector<std::shared_ptr<Graphics::Entity>> m_entities;
         virtual bool update_hook();
 
     private:

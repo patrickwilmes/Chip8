@@ -84,6 +84,10 @@ namespace Graphics::Types {
         {
             m_y = y;
         }
+        void set_color(Color color)
+        {
+            m_color = color;
+        }
 
     private:
         Color m_color;
