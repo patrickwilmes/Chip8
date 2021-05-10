@@ -33,6 +33,7 @@ namespace Chip8 {
     public:
         Interpreter();
         void emulate(const std::string& source_file);
+        bool execute_next_cycle();
     private:
         void load_program(const std::string& source_file);
     private:
@@ -45,6 +46,10 @@ namespace Chip8 {
     public:
         explicit Chip8Application(Graphics::Types::Size size);
         void launch(const std::string& file);
+
+    protected:
+        bool update_hook() override;
+
     private:
         Interpreter m_interpreter;
     };

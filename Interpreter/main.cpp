@@ -24,6 +24,7 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 #include "Chip8.h"
+#include <Common.h>
 #include <Print.h>
 #include <iostream>
 
@@ -34,7 +35,7 @@ int main(int argc, char **argv)
         return -1;
     }
     std::string source_file = argv[1];
-    Chip8::Interpreter interpreter;
-    interpreter.emulate(source_file);
+    Chip8::Chip8Application application(Graphics::Types::Size(500, 500));
+    application.launch(source_file);
     return 0;
 }

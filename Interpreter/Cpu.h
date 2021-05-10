@@ -32,7 +32,7 @@ namespace Chip8 {
         Cpu(std::shared_ptr<MemoryManager> memory_manager, std::shared_ptr<Display> display);
         void dump();
         void core_dump();
-        void execute();
+        bool execute();
 
     private:
         std::shared_ptr<MemoryManager> m_memory_manager;

@@ -34,7 +34,6 @@ Chip8::Interpreter::Interpreter()
 void Chip8::Interpreter::emulate(const std::string& source_file)
 {
     load_program(source_file);
-    m_cpu->execute();
 }
 
 void Chip8::Interpreter::load_program(const std::string& source_file)
@@ -45,6 +44,11 @@ void Chip8::Interpreter::load_program(const std::string& source_file)
     m_memory_manager->place_program(buffer, bytes_read);
 }
 
+bool Chip8::Interpreter::execute_next_cycle()
+{
+    return m_cpu->execute();
+}
+
 Chip8::Chip8Application::Chip8Application(Graphics::Types::Size size)
     : Graphics::Window(size, "Chip8")
 {
@@ -52,5 +56,11 @@ Chip8::Chip8Application::Chip8Application(Graphics::Types::Size size)
 
 void Chip8::Chip8Application::launch(const std::string& file)
 {
-    run(); //TODO: this starts the window render loop and it must be combined with the interpreters 'loop'
+    m_interpreter.emulate(file);
+    run();
+}
+
+bool Chip8::Chip8Application::update_hook()
+{
+    return m_interpreter.execute_next_cycle();
 }

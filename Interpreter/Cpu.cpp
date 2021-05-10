@@ -69,10 +69,10 @@ void Chip8::Cpu::core_dump()
               << std::flush;
 }
 
-void Chip8::Cpu::execute()
+bool Chip8::Cpu::execute()
 {
-    bool should_quit = false;
-    while (!should_quit) {
+    bool should_quit;
+//    while (!should_quit) {
         unsigned short op_code = m_memory_manager->get_at_position(m_program_counter);
         std::cout << int_to_hex(op_code) << std::endl;
         switch (op_code & 0xF000) {
@@ -155,7 +155,6 @@ void Chip8::Cpu::execute()
         }
         m_program_counter += 2;
         should_quit = m_memory_manager->is_program_end(m_program_counter);
-    }
-//    dump();
-//            core_dump();
+//    }
+    return should_quit;
 }
