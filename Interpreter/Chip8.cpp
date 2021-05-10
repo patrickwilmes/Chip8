@@ -77,5 +77,7 @@ void Chip8::Chip8Application::launch(const std::string& file)
 
 bool Chip8::Chip8Application::update_hook()
 {
-    return m_interpreter.execute_next_cycle();
+    bool should_quit = m_interpreter.execute_next_cycle();
+    //TODO: this is the place to hookup the display rendering.
+    return should_quit;
 }
