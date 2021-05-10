@@ -45,6 +45,7 @@ namespace Graphics {
 
     protected:
         std::vector<std::unique_ptr<Graphics::Entity>> m_entities;
+        virtual void update_hook();
 
     private:
         static void init();
