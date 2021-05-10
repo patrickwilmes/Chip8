@@ -71,3 +71,8 @@ unsigned short* Chip8::Display::get_display_data()
 {
     return m_display_data;
 }
+
+void Chip8::Display::set_pixel(int x, int y, int value)
+{
+    m_display_data[y * 32 + x] = value;
+}

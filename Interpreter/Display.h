@@ -27,6 +27,7 @@ namespace Chip8 {
     class Display final {
     public:
         void apply_display_data(const unsigned short new_display_data[32 * 64]);
+        void set_pixel(int x, int y, int value);
         void clear();
         void dump();
         static int get_width();
