@@ -51,11 +51,11 @@ public:
     {
         m_current_color = PIXEL_ON_COLOR;
     }
-    int get_x()
+    int get_x() const
     {
         return m_x;
     }
-    int get_y()
+    int get_y() const
     {
         return m_y;
     }
