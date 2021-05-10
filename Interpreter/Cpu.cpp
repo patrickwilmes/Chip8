@@ -22,8 +22,8 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Cpu.h"
-#include <Types.h>
 #include <Print.h>
+#include <Types.h>
 #include <iostream>
 #include <utility>
 
@@ -72,89 +72,87 @@ void Chip8::Cpu::core_dump()
 bool Chip8::Cpu::execute()
 {
     bool should_quit;
-//    while (!should_quit) {
-        unsigned short op_code = m_memory_manager->get_at_position(m_program_counter);
-        std::cout << int_to_hex(op_code) << std::endl;
-        switch (op_code & 0xF000) {
-        case 0x0000: {
-            unsigned short last_byte = op_code & 0x00FF;
-            if (last_byte == 0xE0) {
-                msg("clearing screen\n");
-                m_display->clear();
-            } else if (last_byte == 0xEE) {
-                //TODO: return from subroutine
-            } else {
-                //TODO: call machine code routine at address NNN.
-            }
-            break;
+    unsigned short op_code = m_memory_manager->get_at_position(m_program_counter);
+    std::cout << int_to_hex(op_code) << std::endl;
+    switch (op_code & 0xF000) {
+    case 0x0000: {
+        unsigned short last_byte = op_code & 0x00FF;
+        if (last_byte == 0xE0) {
+            msg("clearing screen\n");
+            m_display->clear();
+        } else if (last_byte == 0xEE) {
+            //TODO: return from subroutine
+        } else {
+            //TODO: call machine code routine at address NNN.
         }
-        case 0x1000: {
-            unsigned short target_address = op_code & 0x0FFF;
-            m_program_counter_backup = m_program_counter;
-            m_program_counter = target_address;
-            msg("moving to a different address. from: ", int_to_hex(m_program_counter_backup), " to: ", int_to_hex(m_program_counter));
-            break;
-        }
-        case 0x2000: {
-            //TODO
-            break;
-        }
-        case 0x3000: {
-            //TODO
-            break;
-        }
-        case 0x4000: {
-            //TODO
-            break;
-        }
-        case 0x5000: {
-            //TODO
-            break;
-        }
-        case 0x6000: {
-            unsigned short target_register = (op_code & 0x0F00) >> 8;
-            m_registers[target_register] = op_code & 0x00FF;
-            msg("pushing value into register. register V", int_to_hex(target_register), " value: ", op_code & 0x00FF);
-            break;
-        }
-        case 0x7000: {
-            break;
-        }
-        case 0x8000: {
-            //TODO:
-            break;
-        }
-        case 0x9000: {
-            //TODO:
-            break;
-        }
-        case 0xA000: {
-            //TODO
-            break;
-        }
-        case 0xB000: {
-            //TODO
-            break;
-        }
-        case 0xC000: {
-            //TODO
-            break;
-        }
-        case 0xD000: {
-            //TODO
-            break;
-        }
-        case 0xE000: {
-            //TODO
-            break;
-        }
-        case 0xF000: {
-            //TODO
-            break;
-        }
-        }
-        m_program_counter += 2;
-        should_quit = m_memory_manager->is_program_end(m_program_counter);
-//    }
+        break;
+    }
+    case 0x1000: {
+        unsigned short target_address = op_code & 0x0FFF;
+        m_program_counter_backup = m_program_counter;
+        m_program_counter = target_address;
+        msg("moving to a different address. from: ", int_to_hex(m_program_counter_backup), " to: ", int_to_hex(m_program_counter));
+        break;
+    }
+    case 0x2000: {
+        //TODO
+        break;
+    }
+    case 0x3000: {
+        //TODO
+        break;
+    }
+    case 0x4000: {
+        //TODO
+        break;
+    }
+    case 0x5000: {
+        //TODO
+        break;
+    }
+    case 0x6000: {
+        unsigned short target_register = (op_code & 0x0F00) >> 8;
+        m_registers[target_register] = op_code & 0x00FF;
+        msg("pushing value into register. register V", int_to_hex(target_register), " value: ", op_code & 0x00FF);
+        break;
+    }
+    case 0x7000: {
+        break;
+    }
+    case 0x8000: {
+        //TODO:
+        break;
+    }
+    case 0x9000: {
+        //TODO:
+        break;
+    }
+    case 0xA000: {
+        //TODO
+        break;
+    }
+    case 0xB000: {
+        //TODO
+        break;
+    }
+    case 0xC000: {
+        //TODO
+        break;
+    }
+    case 0xD000: {
+        //TODO
+        break;
+    }
+    case 0xE000: {
+        //TODO
+        break;
+    }
+    case 0xF000: {
+        //TODO
+        break;
+    }
+    }
+    m_program_counter += 2;
+    should_quit = m_memory_manager->is_program_end(m_program_counter);
     return should_quit;
 }
