@@ -33,8 +33,11 @@ constexpr Graphics::Types::Color PIXEL_OFF_COLOR = { .r = 0, .g = 0, .b = 0, .a 
 
 class Pixel : public Graphics::Entity {
 public:
-    explicit Pixel(Graphics::Types::Rectangle<int> initial_position)
+    Pixel(Graphics::Types::Rectangle<int> initial_position, int x, int y)
         : m_rect(initial_position)
+        , m_current_color(PIXEL_OFF_COLOR)
+        , m_x(x)
+        , m_y(y)
     {
     }
     void update() override
@@ -48,16 +51,26 @@ public:
     {
         m_current_color = PIXEL_ON_COLOR;
     }
+    int get_x()
+    {
+        return m_x;
+    }
+    int get_y()
+    {
+        return m_y;
+    }
 
 protected:
     void draw_component(std::shared_ptr<Graphics::Painter> painter) override
     {
+        m_rect.set_color(m_current_color);
         painter->draw_rect(m_rect);
     }
 
 private:
     Graphics::Types::Rectangle<int> m_rect;
     Graphics::Types::Color m_current_color;
+    int m_x, m_y;
 };
 
 Chip8::Interpreter::Interpreter()
@@ -124,8 +137,8 @@ void Chip8::Chip8Application::launch(const std::string& file)
             current_col += cell_width;
         }
         Graphics::Types::Rectangle<int> rect(PIXEL_OFF_COLOR, current_col, current_row * cell_height, cell_width, cell_height);
-        auto entity = std::make_unique<Pixel>(rect);
-        register_entity(std::move(entity));
+        auto entity = std::make_shared<Pixel>(rect, current_col, current_row * cell_height);
+        register_entity(entity);
     }
     run();
 }
@@ -136,6 +149,26 @@ bool Chip8::Chip8Application::update_hook()
     int display_width = m_interpreter.get_display_width();
     int display_height = m_interpreter.get_display_height();
     unsigned short* display_data = m_interpreter.get_display_data();
-    //TODO: this is the place to hookup the display rendering.
+    int current_row = -1;
+    int current_col = 0;
+    for (size_t i = 0; i < display_width * display_height; i++) {
+        if (i % display_width) {
+            current_col = 0;
+            current_row++;
+        } else {
+            current_col++;
+        }
+        for (auto& entity : m_entities) {
+            auto e = std::static_pointer_cast<Pixel>(entity);
+            if (current_col == e->get_x() && current_row == e->get_y()) {
+                auto target_bit = display_data[current_row * 64 + current_col];
+                if (target_bit == 1) {
+                    e->toggle_on();
+                } else {
+                    e->toggle_off();
+                }
+            }
+        }
+    }
     return should_quit;
 }
