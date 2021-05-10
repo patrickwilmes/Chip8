@@ -43,6 +43,9 @@ namespace Graphics {
         void set_clear_color(int r, int g, int b, int a);
         void register_entity(std::unique_ptr<Entity> entity);
 
+    protected:
+        std::vector<std::unique_ptr<Graphics::Entity>> m_entities;
+
     private:
         static void init();
         static SDL_Window* create_window(Graphics::Types::Point position, Graphics::Types::Size size, std::string title);
@@ -50,9 +53,6 @@ namespace Graphics {
         static Tuple<int> initialize_screen_info();
         static std::shared_ptr<Painter> initialize_painter(SDL_Renderer* renderer, Graphics::Types::Color clear_color);
         void update();
-
-    protected:
-        std::vector<std::unique_ptr<Graphics::Entity>> m_entities;
 
     private:
         SDL_Window* m_window = nullptr;
