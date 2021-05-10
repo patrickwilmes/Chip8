@@ -63,11 +63,9 @@ public:
     MyWindow(Graphics::Types::Size size, std::string title)
         : Graphics::Window(size, std::move(title))
     {
-        auto square = std::make_unique<MySquare>();
-//        auto rect = std::make_unique<MyRect>();
+        auto square = std::make_shared<MySquare>();
         set_clear_color(100, 100, 0, 0);
-        register_entity(std::move(square));
-//        register_entity(std::move(rect));
+        register_entity(square);
     }
 };
 
