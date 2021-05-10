@@ -26,8 +26,10 @@
 #include <Graphics.h>
 #include <Types.h>
 #include <cstdio>
+#include <iostream>
 
-constexpr Graphics::Types::Color PIXEL_ON_COLOR = {.r = 255, .g = 255, .b = 255, .a = 0};
+constexpr Graphics::Types::Color PIXEL_ON_COLOR = { .r = 255, .g = 255, .b = 255, .a = 0 };
+constexpr Graphics::Types::Color PIXEL_OFF_COLOR = { .r = 0, .g = 0, .b = 0, .a = 0 };
 
 class Pixel : public Graphics::Entity {
 public:
@@ -38,14 +40,24 @@ public:
     void update() override
     {
     }
+    void toggle_off()
+    {
+        m_current_color = PIXEL_OFF_COLOR;
+    }
+    void toggle_on()
+    {
+        m_current_color = PIXEL_ON_COLOR;
+    }
 
 protected:
     void draw_component(std::shared_ptr<Graphics::Painter> painter) override
     {
+        painter->draw_rect(m_rect);
     }
 
 private:
     Graphics::Types::Rectangle<int> m_rect;
+    Graphics::Types::Color m_current_color;
 };
 
 Chip8::Interpreter::Interpreter()
@@ -98,8 +110,20 @@ void Chip8::Chip8Application::launch(const std::string& file)
     m_interpreter.emulate(file);
     auto width = m_interpreter.get_display_width();
     auto height = m_interpreter.get_display_height();
+    auto window_width = get_window_width();
+    auto window_height = get_window_height();
+    auto cell_height = window_height / height;
+    auto cell_width = window_width / width;
+    int current_row = -1;
+    int current_col = 0;
     for (size_t i = 0; i < width * height; i++) {
-        Graphics::Types::Rectangle<int> rect(PIXEL_ON_COLOR, 0, 0, 20, 20);
+        if (i % width == 0) {
+            current_col = 0;
+            current_row++;
+        } else {
+            current_col += cell_width;
+        }
+        Graphics::Types::Rectangle<int> rect(PIXEL_OFF_COLOR, current_col, current_row * cell_height, cell_width, cell_height);
         auto entity = std::make_unique<Pixel>(rect);
         register_entity(std::move(entity));
     }

@@ -35,7 +35,7 @@ int main(int argc, char **argv)
         return -1;
     }
     std::string source_file = argv[1];
-    Chip8::Chip8Application application(Graphics::Types::Size(500, 500));
+    Chip8::Chip8Application application(Graphics::Types::Size(64 * 10, 32 * 10));
     application.launch(source_file);
     return 0;
 }
