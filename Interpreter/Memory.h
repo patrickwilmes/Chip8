@@ -35,7 +35,7 @@ namespace Chip8 {
         bool is_program_end(u32 position);
     private:
         void reset_memory();
-        void ensure_non_protected_access(u32 position);
+        static void ensure_non_protected_access(u32 position);
 
     private:
         static constexpr u32 MEMORY_SIZE = 1 << 12;
