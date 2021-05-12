@@ -71,8 +71,10 @@ unsigned short Chip8::MemoryManager::get_at_position(const u32 position)
 
 void Chip8::MemoryManager::ensure_non_protected_access(const u32 position)
 {
+#ifdef USE_MEM_ASSERT
     ASSERT(position >= 0x200, "Access below 0x200 no allowed!");
     ASSERT(position < 0xF00, "Access above 0xF00 not allowed!");
+#endif
 }
 
 bool Chip8::MemoryManager::is_program_end(u32 position)
