@@ -278,8 +278,8 @@ bool Chip8::Cpu::execute()
         break;
     }
     case 0xB000: {
-        msg("0xB000 jumping to new location\n");
         auto address = m_registers[V0] + op_code & 0x0FFF;
+        msg("0xB000 jumping to new location: ", int_to_hex(address));
         m_program_counter_backup = m_program_counter;
         m_program_counter = address;
         break;
