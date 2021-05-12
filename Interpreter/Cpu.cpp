@@ -318,5 +318,8 @@ bool Chip8::Cpu::execute()
     if (should_increment_pc)
         m_program_counter += 2;
     should_quit = m_memory_manager->is_program_end(m_program_counter);
+    m_op_code_count++;
+    if (should_quit)
+        std::cout << "OPCODE COUNT: " << m_op_code_count << std::endl;
     return should_quit;
 }
