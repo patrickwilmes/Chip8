@@ -23,8 +23,61 @@
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Entity.h"
 
+Graphics::Entity::Entity(int x, int y, int width, int height, Graphics::Types::Color color)
+    : m_x(x)
+    , m_y(y)
+    , m_width(width)
+    , m_height(height)
+    , m_color(color)
+{
+}
+
 void Graphics::Entity::draw(const std::shared_ptr<Painter>& painter)
 {
     draw_component(painter);
 }
 
+int Graphics::Entity::get_x() const
+{
+    return m_x;
+}
+
+int Graphics::Entity::get_y() const
+{
+    return m_y;
+}
+
+int Graphics::Entity::get_width() const
+{
+    return m_width;
+}
+
+int Graphics::Entity::get_height() const
+{
+    return m_height;
+}
+
+void Graphics::Entity::set_x(int x)
+{
+    m_x = x;
+}
+
+void Graphics::Entity::set_y(int y)
+{
+    m_y = y;
+}
+
+void Graphics::Entity::set_width(int width)
+{
+    m_width = width;
+}
+
+void Graphics::Entity::set_height(int height)
+{
+    m_height = height;
+}
+
+void Graphics::Entity::set_color(Graphics::Types::Color color)
+{
+    m_color = color;
+}

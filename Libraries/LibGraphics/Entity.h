@@ -28,10 +28,23 @@
 namespace Graphics {
     class Entity {
     public:
+        Entity(int x, int y, int width, int height, Graphics::Types::Color color);
         void draw(const std::shared_ptr<Painter>& painter);
         virtual void update() = 0;
+        [[nodiscard]] int get_x() const;
+        [[nodiscard]] int get_y() const;
+        [[nodiscard]] int get_width() const;
+        [[nodiscard]] int get_height() const;
+        void set_x(int x);
+        void set_y(int y);
+        void set_width(int width);
+        void set_height(int height);
+        void set_color(Graphics::Types::Color color);
 
     protected:
         virtual void draw_component(std::shared_ptr<Painter> painter) = 0;
+    protected:
+        int m_x, m_y, m_width, m_height;
+        Graphics::Types::Color m_color;
     };
 }
