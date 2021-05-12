@@ -7,6 +7,8 @@ set(SOURCES
         DisplayBuffer.h
         Cpu.cpp
         Cpu.h
+        Sprite.cpp
+        Sprite.h
         main.cpp
         )
 
