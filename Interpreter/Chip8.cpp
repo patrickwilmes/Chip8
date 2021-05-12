@@ -28,38 +28,6 @@
 #include <cstdio>
 #include <iostream>
 
-class Sprite : public Graphics::Entity {
-public:
-    Sprite(Graphics::Types::Point initial_position, int height, int cell_width)
-        : m_initial_position(initial_position)
-        , m_height(height == 0 ? 1 : height)
-        , m_cell_width(cell_width == 0 ? 10 : cell_width)
-    {
-    }
-
-    void update() override
-    {
-    }
-
-protected:
-    void draw_component(std::shared_ptr<Graphics::Painter> painter) override
-    {
-        Graphics::Types::Rectangle<int> rect(
-            COLOR_WHITE,
-            m_initial_position.get_first(),
-            m_initial_position.get_second(),
-            8 * m_cell_width,
-            m_height);
-        painter->draw_rect(rect);
-    }
-
-private:
-    Graphics::Types::Point m_initial_position;
-    int m_height;
-    int m_cell_width;
-    static constexpr Graphics::Types::Color COLOR_WHITE = { .r = 255, .g = 255, .b = 255, .a = 0 };
-};
-
 Chip8::Chip8Application::Chip8Application(Graphics::Types::Size size)
     : Graphics::Window(size, "Chip8")
 {
