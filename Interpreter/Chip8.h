@@ -23,10 +23,10 @@
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #pragma once
 #include "Cpu.h"
-#include "Display.h"
+#include "DisplayBuffer.h"
 #include <Window.h>
-#include <string>
 #include <memory>
+#include <string>
 
 namespace Chip8 {
     class Chip8Application final : public Graphics::Window {
@@ -42,7 +42,7 @@ namespace Chip8 {
 
     private:
         std::shared_ptr<MemoryManager> m_memory_manager = nullptr;
-        std::shared_ptr<Display> m_display = nullptr;
+        std::shared_ptr<DisplayBuffer> m_display = nullptr;
         std::unique_ptr<Cpu> m_cpu = nullptr;
     };
 }

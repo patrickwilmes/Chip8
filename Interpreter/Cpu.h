@@ -22,21 +22,21 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #pragma once
-#include "Display.h"
+#include "DisplayBuffer.h"
 #include "Memory.h"
 #include <memory>
 
 namespace Chip8 {
     class Cpu final {
     public:
-        Cpu(std::shared_ptr<MemoryManager> memory_manager, std::shared_ptr<Display> display);
+        Cpu(std::shared_ptr<MemoryManager> memory_manager, std::shared_ptr<DisplayBuffer> display);
         void dump();
         void core_dump();
         bool execute();
 
     private:
         std::shared_ptr<MemoryManager> m_memory_manager;
-        std::shared_ptr<Display> m_display;
+        std::shared_ptr<DisplayBuffer> m_display;
         enum {
             V0 = 0,
             V1,

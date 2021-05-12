@@ -21,22 +21,58 @@
 // CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-#pragma once
+#include "DisplayBuffer.h"
+#include <Types.h>
+#include <cstddef>
+#include <iostream>
 
-namespace Chip8 {
-    class Display final {
-    public:
-        void apply_display_data(const unsigned short new_display_data[32 * 64]);
-        void set_pixel(int x, int y, int value);
-        void clear();
-        void dump();
-        static int get_width();
-        static int get_height();
-        unsigned short* get_display_data();
+void Chip8::DisplayBuffer::apply_display_data(const unsigned short* new_display_data)
+{
+    for (size_t i = 0; i < 32 * 64; i++) {
+        unsigned short current_value = m_display_data[i];
+        unsigned short new_value = new_display_data[i];
 
-    private:
-        const static int DISPLAY_WIDTH = 64;
-        const static int DISPLAY_HEIGHT = 32;
-        unsigned short m_display_data[DISPLAY_WIDTH * DISPLAY_WIDTH];
-    };
+        unsigned short ored = current_value | new_value;
+        unsigned short neg_ored = ~current_value | ~new_value;
+        m_display_data[i] = ored & neg_ored;
+    }
+}
+
+void Chip8::DisplayBuffer::clear()
+{
+    for (auto& data : m_display_data) {
+        data = 0;
+    }
+}
+
+void Chip8::DisplayBuffer::dump()
+{
+    const size_t ROW_SIZE = 1 << 6;
+    for (size_t i = 0; i < 32 * 64; i++) {
+        if (i % ROW_SIZE == 0) {
+            std::cout << '\n'
+                      << std::flush;
+        }
+        std::cout << Common::int_to_hex((int)m_display_data[i]) << " ";
+    }
+}
+
+int Chip8::DisplayBuffer::get_width()
+{
+    return DISPLAY_WIDTH;
+}
+
+int Chip8::DisplayBuffer::get_height()
+{
+    return DISPLAY_HEIGHT;
+}
+
+unsigned short* Chip8::DisplayBuffer::get_display_data()
+{
+    return m_display_data;
+}
+
+void Chip8::DisplayBuffer::set_pixel(int x, int y, int value)
+{
+    m_display_data[y * 32 + x] = value;
 }

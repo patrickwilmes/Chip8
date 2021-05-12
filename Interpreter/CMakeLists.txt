@@ -3,8 +3,8 @@ set(SOURCES
         Chip8.h
         Memory.cpp
         Memory.h
-        Display.cpp
-        Display.h
+        DisplayBuffer.cpp
+        DisplayBuffer.h
         Cpu.cpp
         Cpu.h
         main.cpp

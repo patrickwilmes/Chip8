@@ -32,7 +32,7 @@ Chip8::Chip8Application::Chip8Application(Graphics::Types::Size size)
     : Graphics::Window(size, "Chip8")
 {
     m_memory_manager = std::make_shared<MemoryManager>();
-    m_display = std::make_shared<Display>();
+    m_display = std::make_shared<DisplayBuffer>();
     m_cpu = std::make_unique<Cpu>(m_memory_manager, m_display);
 }
 

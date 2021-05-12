@@ -30,7 +30,7 @@
 
 using namespace Common;
 
-Chip8::Cpu::Cpu(std::shared_ptr<MemoryManager> memory_manager, std::shared_ptr<Display> display)
+Chip8::Cpu::Cpu(std::shared_ptr<MemoryManager> memory_manager, std::shared_ptr<DisplayBuffer> display)
     : m_memory_manager(std::move(memory_manager))
     , m_display(std::move(display))
 {
@@ -63,7 +63,7 @@ void Chip8::Cpu::core_dump()
     m_memory_manager->dump();
     std::cout << "\n=============================================" << '\n'
               << std::flush;
-    std::cout << "==================Display Dump=================" << '\n'
+    std::cout << "==================DisplayBuffer Dump=================" << '\n'
               << std::flush;
     m_display->dump();
     std::cout << "\n=============================================" << '\n'
