@@ -74,5 +74,11 @@ unsigned short* Chip8::DisplayBuffer::get_display_data()
 
 void Chip8::DisplayBuffer::set_pixel(int x, int y, int value)
 {
-    m_display_data[y * 32 + x] = value;
+    int position = y * 32 + x;
+    unsigned short current_value = m_display_data[position];
+    unsigned short new_value = value;
+
+    unsigned short ored = current_value | new_value;
+    unsigned short neg_ored = ~current_value | ~new_value;
+    m_display_data[position] = ored & neg_ored;
 }
