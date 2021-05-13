@@ -40,7 +40,7 @@ namespace Chip8 {
 
     private:
         static constexpr u32 MEMORY_SIZE = 1 << 12;
-        unsigned char m_memory[MEMORY_SIZE] = {};
+        uint8_t m_memory[MEMORY_SIZE] = {};
     };
 
 }

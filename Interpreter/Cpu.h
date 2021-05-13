@@ -54,10 +54,12 @@ namespace Chip8 {
             VD,
             VF
         };
-        unsigned char m_registers[16] {};
+        uint8_t m_registers[16] {};
         short int m_address_register {};
-        u32 m_program_counter = 0x200;
-        u32 m_program_counter_backup = m_program_counter;
+        uint16_t m_program_counter = 0x200;
+        uint16_t m_program_counter_backup = m_program_counter;
+        uint16_t stack[16] {};
+        uint8_t sp{};
         u32 m_op_code_count = 0;
     };
 }

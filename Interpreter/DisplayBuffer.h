@@ -23,6 +23,7 @@
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #pragma once
 
+#include <cstdint>
 namespace Chip8 {
     class DisplayBuffer final {
     public:
@@ -32,11 +33,11 @@ namespace Chip8 {
         void dump();
         static int get_width();
         static int get_height();
-        unsigned short* get_display_data();
+        uint32_t* get_display_data();
 
     private:
         const static int DISPLAY_WIDTH = 64;
         const static int DISPLAY_HEIGHT = 32;
-        unsigned short m_display_data[DISPLAY_WIDTH * DISPLAY_WIDTH];
+        uint32_t m_display_data[DISPLAY_WIDTH * DISPLAY_WIDTH];
     };
 }

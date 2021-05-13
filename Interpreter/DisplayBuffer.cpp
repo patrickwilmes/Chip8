@@ -24,6 +24,7 @@
 #include "DisplayBuffer.h"
 #include <Types.h>
 #include <cstddef>
+#include <cstdint>
 #include <iostream>
 
 void Chip8::DisplayBuffer::apply_display_data(const unsigned short* new_display_data)
@@ -67,7 +68,7 @@ int Chip8::DisplayBuffer::get_height()
     return DISPLAY_HEIGHT;
 }
 
-unsigned short* Chip8::DisplayBuffer::get_display_data()
+uint32_t* Chip8::DisplayBuffer::get_display_data()
 {
     return m_display_data;
 }
