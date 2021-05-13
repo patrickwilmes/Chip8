@@ -35,11 +35,12 @@ namespace Chip8 {
         bool is_program_end(u32 position);
     private:
         void reset_memory();
+        void load_fontset();
         static void ensure_non_protected_access(u32 position);
 
     private:
         static constexpr u32 MEMORY_SIZE = 1 << 12;
-        unsigned char m_memory[MEMORY_SIZE];
+        unsigned char m_memory[MEMORY_SIZE] = {};
     };
 
 }
