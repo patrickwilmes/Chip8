@@ -25,11 +25,12 @@
 #include <Entity.h>
 #include <Graphics.h>
 #include <Types.h>
+#include <chrono>
 #include <fstream>
 #include <iostream>
 
 Chip8::Chip8Application::Chip8Application(Graphics::Types::Size size)
-    : Graphics::Window(size, "Chip8"), m_cell_width(size.get_first() / HORIZONTAL_PIXEL_COUNT), m_cell_height(size.get_second() / VERTICAL_PIXEL_COUNT)
+    : Graphics::Window(size, Graphics::Types::Size(64, 32), "Chip8")
 {
     m_memory_manager = std::make_shared<MemoryManager>();
     m_display = std::make_shared<DisplayBuffer>();
@@ -38,14 +39,19 @@ Chip8::Chip8Application::Chip8Application(Graphics::Types::Size size)
 
 void Chip8::Chip8Application::launch(const std::string& file)
 {
+    int video_pitch = sizeof(m_display->get_display_data()[0]) * m_display->get_width();
     load_program(file);
-    run();
-}
-
-bool Chip8::Chip8Application::update_hook()
-{
-    bool should_quit = m_cpu->execute();
-    return should_quit;
+    bool quit = false;
+    auto last_cycle = std::chrono::high_resolution_clock::now();
+    while (!quit) {
+        quit = process_input(m_cpu->get_keypad());
+        auto now = std::chrono::high_resolution_clock::now();
+        float dt = std::chrono::duration<float, std::chrono::milliseconds::period>(now - last_cycle).count();
+        if (dt > 1) {
+            m_cpu->execute();
+            update_texture(m_display->get_display_data(), video_pitch);
+        }
+    }
 }
 
 void Chip8::Chip8Application::load_program(const std::string& source_file)
@@ -53,7 +59,7 @@ void Chip8::Chip8Application::load_program(const std::string& source_file)
     std::ifstream infile(source_file, std::ios::binary | std::ios::ate);
     if (infile.is_open()) {
         std::streampos size = infile.tellg();
-        char *buffer = new char[size];
+        char* buffer = new char[size];
 
         infile.seekg(0, std::ios::beg);
         infile.read(buffer, size);

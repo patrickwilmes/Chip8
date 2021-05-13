@@ -112,3 +112,12 @@ void Chip8::MemoryManager::load_fontset()
         m_memory[FONTSET_STAT_ADDRESS + i] = fontset[i];
     }
 }
+uint8_t Chip8::MemoryManager::get_value(uint32_t position)
+{
+    return m_memory[position];
+}
+
+void Chip8::MemoryManager::set_value(uint32_t position, uint8_t value)
+{
+    m_memory[position] = value;
+}

@@ -25,6 +25,7 @@
 #include <Types.h>
 #include <cstddef>
 #include <cstdint>
+#include <cstring>
 #include <iostream>
 
 void Chip8::DisplayBuffer::apply_display_data(const unsigned short* new_display_data)
@@ -41,9 +42,7 @@ void Chip8::DisplayBuffer::apply_display_data(const unsigned short* new_display_
 
 void Chip8::DisplayBuffer::clear()
 {
-    for (auto& data : m_display_data) {
-        data = 0;
-    }
+    memset(m_display_data, 0, sizeof(m_display_data));
 }
 
 void Chip8::DisplayBuffer::dump()

@@ -32,6 +32,8 @@ namespace Chip8 {
         void place_program(const char* data, long size);
         void dump();
         unsigned short get_at_position(u32 position);
+        void set_value(uint32_t position, uint8_t value);
+        uint8_t get_value(uint32_t position);
         bool is_program_end(u32 position);
     private:
         void reset_memory();

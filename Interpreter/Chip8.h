@@ -34,19 +34,12 @@ namespace Chip8 {
         explicit Chip8Application(Graphics::Types::Size size);
         void launch(const std::string& file);
 
-    protected:
-        bool update_hook() override;
-
     private:
         void load_program(const std::string& source_file);
 
     private:
-        static const int HORIZONTAL_PIXEL_COUNT = 64;
-        static const int VERTICAL_PIXEL_COUNT = 32;
         std::shared_ptr<MemoryManager> m_memory_manager = nullptr;
         std::shared_ptr<DisplayBuffer> m_display = nullptr;
         std::unique_ptr<Cpu> m_cpu = nullptr;
-        int m_cell_width;
-        int m_cell_height;
     };
 }

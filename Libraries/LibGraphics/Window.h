@@ -36,7 +36,7 @@ namespace Graphics {
     class Window {
     public:
         Window(Graphics::Types::Size size, std::string title);
-        Window(Graphics::Types::Point position, Graphics::Types::Size size, std::string title);
+        Window(Graphics::Types::Size size, Graphics::Types::Size texture_size, std::string title);
         ~Window();
         void run();
         void set_clear_color(Graphics::Types::Color color);
@@ -48,6 +48,8 @@ namespace Graphics {
     protected:
         std::vector<std::shared_ptr<Graphics::Entity>> m_entities;
         virtual bool update_hook();
+        void update_texture(void const* buffer, int pitch);
+        bool process_input(uint8_t *keys);
 
     private:
         static void init();
@@ -60,6 +62,7 @@ namespace Graphics {
     private:
         SDL_Window* m_window = nullptr;
         SDL_Renderer* m_renderer = nullptr;
+        SDL_Texture* m_texture = nullptr;
         int m_screen_width;
         int m_screen_height;
         Graphics::Types::Color m_clear_color = { .r = 0, .g = 0, .b = 0, .a = 0 };

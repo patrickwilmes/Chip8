@@ -25,41 +25,84 @@
 #include "DisplayBuffer.h"
 #include "Memory.h"
 #include <memory>
+#include <random>
 
 namespace Chip8 {
+    const unsigned int KEY_COUNT = 16;
+
     class Cpu final {
     public:
         Cpu(std::shared_ptr<MemoryManager> memory_manager, std::shared_ptr<DisplayBuffer> display);
         void dump();
         void core_dump();
-        bool execute();
+        void execute();
+        uint8_t * get_keypad();
+
+    private:
+        void table_0();
+        void table_8();
+        void table_e();
+        void table_f();
+
+        void opcode_none();
+        void opcode_00E0();
+        void opcode_00EE();
+        void opcode_1nnn();
+        void opcode_2nnn();
+        void opcode_3xkk();
+        void opcode_4xkk();
+        void opcode_5xy0();
+        void opcode_6xkk();
+        void opcode_7xkk();
+        void opcode_8xy0();
+        void opcode_8xy1();
+        void opcode_8xy2();
+        void opcode_8xy3();
+        void opcode_8xy4();
+        void opcode_8xy5();
+        void opcode_8xy6();
+        void opcode_8xy7();
+        void opcode_8xyE();
+        void opcode_9xy0();
+        void opcode_Annn();
+        void opcode_Bnnn();
+        void opcode_Cxkk();
+        void opcode_Dxyn();
+        void opcode_Ex9E();
+        void opcode_ExA1();
+        void opcode_Fx07();
+        void opcode_Fx0A();
+        void opcode_Fx15();
+        void opcode_Fx18();
+        void opcode_Fx1E();
+        void opcode_Fx29();
+        void opcode_Fx33();
+        void opcode_Fx55();
+        void opcode_Fx65();
 
     private:
         std::shared_ptr<MemoryManager> m_memory_manager;
         std::shared_ptr<DisplayBuffer> m_display;
-        enum {
-            V0 = 0,
-            V1,
-            V2,
-            V3,
-            V4,
-            V5,
-            V6,
-            V7,
-            V8,
-            V9,
-            VA,
-            VB,
-            VC,
-            VD,
-            VF
-        };
+
+        uint8_t m_delay_timer{};
+        uint8_t m_sound_timer{};
+
+        std::default_random_engine m_random_generator;
+        std::uniform_int_distribution<uint8_t> m_random_byte;
         uint8_t m_registers[16] {};
-        short int m_address_register {};
+        uint16_t m_address_register {};
         uint16_t m_program_counter = 0x200;
-        uint16_t m_program_counter_backup = m_program_counter;
-        uint16_t stack[16] {};
-        uint8_t sp{};
-        u32 m_op_code_count = 0;
+        uint16_t m_stack[16] {};
+        uint8_t m_sp{};
+        uint16_t m_opcode{};
+
+        uint8_t m_keypad[KEY_COUNT]{};
+
+        typedef void (Cpu::*OpCodeFunc)();
+        OpCodeFunc table[0xF + 1]{&Cpu::opcode_none};
+        OpCodeFunc table0[0xE + 1]{&Cpu::opcode_none};
+        OpCodeFunc table8[0xE + 1]{&Cpu::opcode_none};
+        OpCodeFunc tableE[0xE + 1]{&Cpu::opcode_none};
+        OpCodeFunc tableF[0x65 + 1]{&Cpu::opcode_none};
     };
 }

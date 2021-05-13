@@ -38,6 +38,6 @@ namespace Chip8 {
     private:
         const static int DISPLAY_WIDTH = 64;
         const static int DISPLAY_HEIGHT = 32;
-        uint32_t m_display_data[DISPLAY_WIDTH * DISPLAY_WIDTH];
+        uint32_t m_display_data[DISPLAY_WIDTH * DISPLAY_WIDTH]{};
     };
 }

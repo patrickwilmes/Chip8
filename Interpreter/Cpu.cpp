@@ -22,10 +22,9 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Cpu.h"
-#include <Print.h>
 #include <Types.h>
-#include <cmath>
 #include <iostream>
+#include <chrono>
 #include <utility>
 
 using namespace Common;
@@ -33,7 +32,52 @@ using namespace Common;
 Chip8::Cpu::Cpu(std::shared_ptr<MemoryManager> memory_manager, std::shared_ptr<DisplayBuffer> display)
     : m_memory_manager(std::move(memory_manager))
     , m_display(std::move(display))
+, m_random_generator(std::chrono::system_clock::now().time_since_epoch().count())
 {
+    m_random_byte = std::uniform_int_distribution<uint8_t>(0, 255U);
+
+    table[0x0] = &Cpu::table_0;
+    table[0x1] = &Cpu::opcode_1nnn;
+    table[0x2] = &Cpu::opcode_2nnn;
+    table[0x3] = &Cpu::opcode_3xkk;
+    table[0x4] = &Cpu::opcode_4xkk;
+    table[0x5] = &Cpu::opcode_5xy0;
+    table[0x6] = &Cpu::opcode_6xkk;
+    table[0x7] = &Cpu::opcode_7xkk;
+    table[0x8] = &Cpu::table_8;
+    table[0x9] = &Cpu::opcode_9xy0;
+    table[0xA] = &Cpu::opcode_Annn;
+    table[0xB] = &Cpu::opcode_Bnnn;
+    table[0xC] = &Cpu::opcode_Cxkk;
+    table[0xD] = &Cpu::opcode_Dxyn;
+    table[0xE] = &Cpu::table_e;
+    table[0xF] = &Cpu::table_f;
+
+    table0[0x0] = &Cpu::opcode_00E0;
+    table0[0xE] = &Cpu::opcode_00EE;
+
+    table8[0x0] = &Cpu::opcode_8xy0;
+    table8[0x1] = &Cpu::opcode_8xy1;
+    table8[0x2] = &Cpu::opcode_8xy2;
+    table8[0x3] = &Cpu::opcode_8xy3;
+    table8[0x4] = &Cpu::opcode_8xy4;
+    table8[0x5] = &Cpu::opcode_8xy5;
+    table8[0x6] = &Cpu::opcode_8xy6;
+    table8[0x7] = &Cpu::opcode_8xy7;
+    table8[0xE] = &Cpu::opcode_8xyE;
+
+    tableE[0x1] = &Cpu::opcode_ExA1;
+    tableE[0xE] = &Cpu::opcode_Ex9E;
+
+    tableF[0x07] = &Cpu::opcode_Fx07;
+    tableF[0x0A] = &Cpu::opcode_Fx0A;
+    tableF[0x15] = &Cpu::opcode_Fx15;
+    tableF[0x18] = &Cpu::opcode_Fx18;
+    tableF[0x1E] = &Cpu::opcode_Fx1E;
+    tableF[0x29] = &Cpu::opcode_Fx29;
+    tableF[0x33] = &Cpu::opcode_Fx33;
+    tableF[0x55] = &Cpu::opcode_Fx55;
+    tableF[0x65] = &Cpu::opcode_Fx65;
 }
 
 void Chip8::Cpu::dump()
@@ -70,256 +114,426 @@ void Chip8::Cpu::core_dump()
               << std::flush;
 }
 
-bool Chip8::Cpu::execute()
+void Chip8::Cpu::execute()
 {
-    bool should_quit;
-    unsigned short op_code = m_memory_manager->get_at_position(m_program_counter);
-    std::cout << int_to_hex(op_code) << std::endl;
-    bool should_increment_pc = true;
-    switch (op_code & 0xF000) {
-    case 0x0000: {
-        unsigned short last_byte = op_code & 0x00FF;
-        if (last_byte == 0xE0) {
-            msg("clearing screen\n");
-            m_display->clear();
-        } else if (last_byte == 0xEE) {
-            msg("Returning from subroutine\n");
-            m_program_counter = m_program_counter_backup;
-        } else {
-            msg("Calling subroutine\n");
-            m_program_counter_backup = m_program_counter;
-            auto new_address = op_code & 0x0FFF;
-            m_program_counter = new_address;
-            should_increment_pc = false;
-        }
-        break;
-    }
-    case 0x1000: {
-        unsigned short target_address = op_code & 0x0FFF;
-        m_program_counter_backup = m_program_counter;
-        m_program_counter = target_address;
-        msg("moving to a different address. from: ", int_to_hex(m_program_counter_backup), " to: ", int_to_hex(m_program_counter));
-        break;
-    }
-    case 0x2000: {
-        msg("Calling subroutine 0x2000\n");
-        auto new_address = op_code & 0x0FFF;
-        m_program_counter_backup = m_program_counter;
-        m_program_counter = new_address;
-        should_increment_pc = false;
-        break;
-    }
-    case 0x3000: {
-        msg("Checking 0x3000 if should skip next instruction\n");
-        auto target_register = (op_code & 0x0F00) >> 8;
-        auto target_value = op_code & 0x00FF;
-        if (m_registers[target_register] == target_value) {
-            msg("0x3000 is true skipping next instruction\n");
-            m_program_counter += 2;
-        }
-        break;
-    }
-    case 0x4000: {
-        msg("Checking 0x4000 if should skip next instruction\n");
-        auto target_register = (op_code & 0x0F00) >> 8;
-        auto target_value = op_code & 0x00FF;
-        if (m_registers[target_register] != target_value) {
-            msg("0x4000 is true skipping next instruction\n");
-            m_program_counter += 2;
-        }
-        break;
-    }
-    case 0x5000: {
-        msg("Checking 0x5000 if should skip next instruction\n");
-        auto first_target_register = (op_code & 0x0F00) >> 8;
-        auto second_target_register = (op_code & 0x00F0) >> 8;
-        if (m_registers[first_target_register] == m_registers[second_target_register]) {
-            msg("0x5000 is true skipping next instruction\n");
-            m_program_counter += 2;
-        }
-        break;
-    }
-    case 0x6000: {
-        unsigned short target_register = (op_code & 0x0F00) >> 8;
-        m_registers[target_register] = op_code & 0x00FF;
-        msg("pushing value into register. register V", int_to_hex(target_register), " value: ", op_code & 0x00FF);
-        break;
-    }
-    case 0x7000: {
-        auto target_register = (op_code & 0x0F00) >> 8;
-        auto value = op_code & 0x00FF;
-        msg("Adding value ", value, " to register ", target_register);
-        m_registers[target_register] += value;
-        break;
-    }
-    case 0x8000: {
-        msg("Accessing 0x8000\n");
-        auto mode = op_code & 0x000F;
-        msg("0x8000 having mode ", int_to_hex(mode));
-        switch (mode) {
-        case 0x0: {
-            msg("Mode 0x8000 case 0\n");
-            auto first_register = (op_code & 0x0F00) >> 8;
-            auto second_register = (op_code & 0x00F0) >> 8;
-            m_registers[first_register] = m_registers[second_register];
-            break;
-        }
-        case 0x1: {
-            msg("Mode 0x8000 case 1\n");
-            auto first_register = (op_code & 0x0F00) >> 8;
-            auto second_register = (op_code & 0x00F0) >> 8;
-            m_registers[first_register] = m_registers[first_register] | m_registers[second_register];
-            break;
-        }
-        case 0x2: {
-            msg("Mode 0x8000 case 2\n");
-            auto first_register = (op_code & 0x0F00) >> 8;
-            auto second_register = (op_code & 0x00F0) >> 8;
-            m_registers[first_register] = m_registers[first_register] & m_registers[second_register];
-            break;
-        }
-        case 0x3: {
-            msg("Mode 0x8000 case 3\n");
-            auto first_register = (op_code & 0x0F00) >> 8;
-            auto second_register = (op_code & 0x00F0) >> 8;
-            m_registers[first_register] = m_registers[first_register] ^ m_registers[second_register];
-            break;
-        }
-        case 0x4: {
-            msg("Mode 0x8000 case 4\n");
-            auto first_register = (op_code & 0x0F00) >> 8;
-            auto second_register = (op_code & 0x00F0) >> 8;
-            auto first_value = m_registers[first_register];
-            auto second_value = m_registers[second_register];
-            auto result = first_value + second_value;
-            if (abs(result) > 9)
-                m_registers[VF] = 1;
-            else
-                m_registers[VF] = 0;
-            m_registers[first_register] = result;
-            break;
-        }
-        case 0x5: {
-            msg("Mode 0x8000 case 5\n");
-            auto first_register = (op_code & 0x0F00) >> 8;
-            auto second_register = (op_code & 0x00F0) >> 8;
-            auto first_value = m_registers[first_register];
-            auto second_value = m_registers[second_register];
-            auto result = first_value - second_value;
-            if (abs(result) > 9)
-                m_registers[VF] = 1;
-            else
-                m_registers[VF] = 0;
-            m_registers[first_register] = result;
-            break;
-        }
-        case 0x6: {
-            msg("Mode 0x8000 case 6\n");
-            auto first_register = (op_code & 0x0F00) >> 8;
-            auto value = m_registers[first_register];
-            auto least_significant_bit = value & 1;
-            m_registers[VF] = least_significant_bit;
-            m_registers[first_register] = m_registers[first_register] >> 1;
-            break;
-        }
-        case 0x7: {
-            msg("Mode 0x8000 case 7\n");
-            auto first_register = (op_code & 0x0F00) >> 8;
-            auto second_register = (op_code & 0x00F0) >> 8;
-            auto value = m_registers[second_register] - m_registers[first_register];
-            if (abs(value) > 9)
-                m_registers[VF] = 1;
-            else
-                m_registers[VF] = 0;
-            m_registers[first_register] = value;
-            break;
-        }
-        case 0xE: {
-            auto msb = [](int n) {
-                if (n == 0)
-                    return 0;
+    m_opcode = m_memory_manager->get_at_position(m_program_counter);
+    m_program_counter += 2;
+    ((*this).*(table[(m_opcode & 0xF000u) >> 12u]))();
+}
 
-                int msb = 0;
-                n = n / 2;
-                while (n != 0) {
-                    n = n / 2;
-                    msb++;
+void Chip8::Cpu::opcode_none()
+{
+}
+
+void Chip8::Cpu::table_0()
+{
+    ((*this).*(table0[m_opcode & 0x000Fu]))();
+}
+
+void Chip8::Cpu::table_8()
+{
+    ((*this).*(table8[m_opcode & 0x000Fu]))();
+}
+
+void Chip8::Cpu::table_e()
+{
+    ((*this).*(tableE[m_opcode & 0x000Fu]))();
+}
+
+void Chip8::Cpu::table_f()
+{
+    ((*this).*(tableF[m_opcode & 0x00FFu]))();
+}
+
+void Chip8::Cpu::opcode_00E0()
+{
+    m_display->clear();
+}
+
+void Chip8::Cpu::opcode_00EE()
+{
+    --m_sp;
+    m_program_counter = m_stack[m_sp];
+}
+
+void Chip8::Cpu::opcode_1nnn()
+{
+    uint16_t address = m_opcode & 0x0FFFu;
+    m_program_counter = address;
+}
+
+void Chip8::Cpu::opcode_2nnn()
+{
+    uint16_t address = m_opcode & 0xFFFu;
+    m_stack[m_sp] = m_program_counter;
+    ++m_sp;
+    m_program_counter = address;
+}
+
+void Chip8::Cpu::opcode_3xkk()
+{
+    uint8_t vx = (m_opcode & 0x0F00u) >> 8u;
+    uint8_t byte = m_opcode & 0x00FFu;
+    if (m_registers[vx] == byte) {
+        m_program_counter += 2;
+    }
+}
+
+void Chip8::Cpu::opcode_4xkk()
+{
+    uint8_t vx = (m_opcode & 0x0F00u) >> 8u;
+    uint8_t byte = m_opcode & 0x00FFu;
+
+    if (m_registers[vx] != byte) {
+        m_program_counter += 2;
+    }
+}
+
+void Chip8::Cpu::opcode_5xy0()
+{
+    uint8_t vx = (m_opcode & 0x0F00u) >> 8u;
+    uint8_t vy = (m_opcode & 0x00F0u) >> 4u;
+
+    if (m_registers[vx] == m_registers[vy]) {
+        m_program_counter += 2;
+    }
+}
+
+void Chip8::Cpu::opcode_6xkk()
+{
+    uint8_t vx = (m_opcode & 0x0F00u) >> 8u;
+    uint8_t byte = m_opcode & 0x00FFu;
+
+    m_registers[vx] = byte;
+}
+
+void Chip8::Cpu::opcode_7xkk()
+{
+    uint8_t vx = (m_opcode & 0x0F00u) >> 8u;
+    uint8_t byte = m_opcode & 0x00FFu;
+
+    m_registers[vx] += byte;
+}
+
+void Chip8::Cpu::opcode_8xy0()
+{
+    uint8_t vx = (m_opcode & 0x0F00u) >> 8u;
+    uint8_t vy = (m_opcode & 0x00F0u) >> 4u;
+
+    m_registers[vx] = m_registers[vy];
+}
+
+void Chip8::Cpu::opcode_8xy1()
+{
+    uint8_t vx = (m_opcode & 0x0F00u) >> 8u;
+    uint8_t vy = (m_opcode & 0x00F0u) >> 4u;
+
+    m_registers[vx] |= m_registers[vy];
+}
+
+void Chip8::Cpu::opcode_8xy2()
+{
+    uint8_t vx = (m_opcode & 0x0F00u) >> 8u;
+    uint8_t vy = (m_opcode & 0x00F0u) >> 4u;
+
+    m_registers[vx] &= m_registers[vy];
+}
+
+void Chip8::Cpu::opcode_8xy3()
+{
+    uint8_t vx = (m_opcode & 0x0F00u) >> 8u;
+    uint8_t vy = (m_opcode & 0x00F0u) >> 4u;
+
+    m_registers[vx] ^= m_registers[vy];
+}
+
+void Chip8::Cpu::opcode_8xy4()
+{
+    uint8_t vx = (m_opcode & 0x0F00u) >> 8u;
+    uint8_t vy = (m_opcode & 0x00F0u) >> 4u;
+
+    uint16_t sum = m_registers[vx] + m_registers[vy];
+
+    if (sum > 255u) {
+        m_registers[0xF] = 1;
+    } else {
+        m_registers[0xF] = 0;
+    }
+
+    m_registers[vx] = sum & 0xFFu;
+}
+
+void Chip8::Cpu::opcode_8xy5()
+{
+    uint8_t vx = (m_opcode & 0x0F00u) >> 8u;
+    uint8_t vy = (m_opcode & 0x00F0u) >> 4u;
+
+    if (m_registers[vx] > m_registers[vy]) {
+        m_registers[0xF] = 1;
+    } else {
+        m_registers[0xF] = 0;
+    }
+
+    m_registers[vx] -= m_registers[vy];
+}
+
+void Chip8::Cpu::opcode_8xy6()
+{
+    uint8_t vx = (m_opcode & 0x0F00u) >> 8u;
+
+    m_registers[0xF] = (m_registers[vx] & 0x1u);
+
+    m_registers[vx] >>= 1;
+}
+
+void Chip8::Cpu::opcode_8xy7()
+{
+    uint8_t vx = (m_opcode & 0x0F00u) >> 8u;
+    uint8_t vy = (m_opcode & 0x00F0u) >> 4u;
+
+    if (m_registers[vy] > m_registers[vx]) {
+        m_registers[0xF] = 1;
+    } else {
+        m_registers[0xF] = 0;
+    }
+
+    m_registers[vx] = m_registers[vy] - m_registers[vx];
+}
+
+void Chip8::Cpu::opcode_8xyE()
+{
+    uint8_t vx = (m_opcode & 0x0F00u) >> 8u;
+
+    m_registers[0xF] = (m_registers[vx] & 0x80u) >> 7u;
+
+    m_registers[vx] <<= 1;
+}
+
+void Chip8::Cpu::opcode_9xy0()
+{
+    uint8_t vx = (m_opcode & 0x0F00u) >> 8u;
+    uint8_t vy = (m_opcode & 0x00F0u) >> 4u;
+
+    if (m_registers[vx] != m_registers[vy]) {
+        m_program_counter += 2;
+    }
+}
+
+void Chip8::Cpu::opcode_Annn()
+{
+    uint16_t address = m_opcode & 0x0FFFu;
+
+    m_address_register = address;
+}
+
+void Chip8::Cpu::opcode_Bnnn()
+{
+    uint16_t address = m_opcode & 0x0FFFu;
+
+    m_program_counter = m_registers[0] + address;
+}
+
+void Chip8::Cpu::opcode_Cxkk()
+{
+    uint8_t vx = (m_opcode & 0x0F00u) >> 8u;
+    uint8_t byte = m_opcode & 0x00FFu;
+
+    m_registers[vx] = m_random_byte(m_random_generator) & byte;
+}
+
+void Chip8::Cpu::opcode_Dxyn()
+{
+    uint8_t vx = (m_opcode & 0x0F00u) >> 8u;
+    uint8_t vy = (m_opcode & 0x00F0u) >> 4u;
+    uint8_t height = m_opcode & 0x000Fu;
+
+    uint8_t x_pos = m_registers[vx] % 64;
+    uint8_t y_pos = m_registers[vy] % 32;
+
+    m_registers[0xF] = 0;
+
+    for (unsigned int row = 0; row < height; ++row) {
+        uint8_t sprite_byte = m_memory_manager->get_value(m_address_register + row);
+        for (unsigned int col = 0; col < 8; ++col) {
+            uint8_t sprite_pixel = sprite_byte & (0x80u >> col);
+            uint32_t * screen_pixel = &m_display->get_display_data()[(y_pos + row) * 64 + (x_pos + col)];
+            if (sprite_pixel) {
+                if (*screen_pixel == 0xFFFFFFFF)
+                {
+                    m_registers[0xF] = 1;
                 }
 
-                return (1 << msb);
-            };
-            msg("Mode 0x8000 case E\n");
-            auto first_register = (op_code & 0x0F00) >> 8;
-            auto value = m_registers[first_register];
-            m_registers[VF] = msb(value);
-            m_registers[first_register] = m_registers[first_register] << 1;
-            break;
+                *screen_pixel ^= 0xFFFFFFFF;
+            }
         }
-        default:
-            msg("Unknown opcode in 0x6000\n");
-            break;
-        }
-        break;
     }
-    case 0x9000: {
-        msg("0x9000 checking if next instruction should be skipped\n");
-        auto first_register = (op_code & 0x0F00) >> 8;
-        auto second_register = (op_code & 0x0F00) >> 8;
-        if (m_registers[first_register] != m_registers[second_register]) {
-            m_program_counter_backup = m_program_counter;
-            m_program_counter += 2;
-        }
-        break;
-    }
-    case 0xA000: {
-        msg("0xA000 setting I register\n");
-        auto address = op_code & 0x0FFF;
-        m_address_register = address;
-        break;
-    }
-    case 0xB000: {
-        auto address = m_registers[V0] + op_code & 0x0FFF;
-        msg("0xB000 jumping to new location: ", int_to_hex(address));
-        m_program_counter_backup = m_program_counter;
-        m_program_counter = address;
-        break;
-    }
-    case 0xC000: {
-        msg("0xC000 applying rand\n");
-        auto target_register = (op_code & 0x0F00) >> 8;
-        auto value = op_code & 0x00FF;
-        auto rand = std::rand() % 255;
-        m_registers[target_register] = value & rand;
-        break;
-    }
-    case 0xD000: {
-        //FIXME: this might work but is not correctly implemented
-        auto first_register = (op_code & 0x0F00) >> 8;
-        auto second_register = (op_code & 0x00F0) >> 8;
-        auto value = op_code & 0x000F;
-        m_display->set_pixel(m_registers[first_register], m_registers[second_register], value);
-        break;
-    }
-    case 0xE000: {
-        //TODO
-        break;
-    }
-    case 0xF000: {
-        //TODO
-        break;
-    }
-    default: {
-        std::cerr << "unknown opcode: " << int_to_hex(op_code) << '\n'
-                  << std::flush;
-        core_dump();
-        break;
-    }
-    }
-    if (should_increment_pc)
+}
+
+void Chip8::Cpu::opcode_Ex9E()
+{
+    uint8_t vx = (m_opcode & 0x0F00u) >> 8u;
+
+    uint8_t key = m_registers[vx];
+
+    if (m_keypad[key]) {
         m_program_counter += 2;
-    should_quit = m_memory_manager->is_program_end(m_program_counter);
-    m_op_code_count++;
-    if (should_quit)
-        std::cout << "OPCODE COUNT: " << m_op_code_count << std::endl;
-    return should_quit;
+    }
+}
+
+void Chip8::Cpu::opcode_ExA1()
+{
+    uint8_t vx = (m_opcode & 0x0F00u) >> 8u;
+
+    uint8_t key = m_registers[vx];
+
+    if (!m_keypad[key]) {
+        m_program_counter += 2;
+    }
+}
+
+void Chip8::Cpu::opcode_Fx07()
+{
+    uint8_t vx = (m_opcode & 0x0F00u) >> 8u;
+
+    m_registers[vx] = m_delay_timer;
+}
+
+void Chip8::Cpu::opcode_Fx0A()
+{
+    uint8_t vx = (m_opcode & 0x0F00u) >> 8u;
+
+    if (m_keypad[0])
+    {
+        m_registers[vx] = 0;
+    }
+    else if (m_keypad[1])
+    {
+        m_registers[vx] = 1;
+    }
+    else if (m_keypad[2])
+    {
+        m_registers[vx] = 2;
+    }
+    else if (m_keypad[3])
+    {
+        m_registers[vx] = 3;
+    }
+    else if (m_keypad[4])
+    {
+        m_registers[vx] = 4;
+    }
+    else if (m_keypad[5])
+    {
+        m_registers[vx] = 5;
+    }
+    else if (m_keypad[6])
+    {
+        m_registers[vx] = 6;
+    }
+    else if (m_keypad[7])
+    {
+        m_registers[vx] = 7;
+    }
+    else if (m_keypad[8])
+    {
+        m_registers[vx] = 8;
+    }
+    else if (m_keypad[9])
+    {
+        m_registers[vx] = 9;
+    }
+    else if (m_keypad[10])
+    {
+        m_registers[vx] = 10;
+    }
+    else if (m_keypad[11])
+    {
+        m_registers[vx] = 11;
+    }
+    else if (m_keypad[12])
+    {
+        m_registers[vx] = 12;
+    }
+    else if (m_keypad[13])
+    {
+        m_registers[vx] = 13;
+    }
+    else if (m_keypad[14])
+    {
+        m_registers[vx] = 14;
+    }
+    else if (m_keypad[15])
+    {
+        m_registers[vx] = 15;
+    }
+    else
+    {
+        m_program_counter -= 2;
+    }
+}
+
+void Chip8::Cpu::opcode_Fx15()
+{
+    uint8_t vx = (m_opcode & 0x0F00u) >> 8u;
+
+    m_delay_timer = m_registers[vx];
+}
+
+void Chip8::Cpu::opcode_Fx18()
+{
+    uint8_t vx = (m_opcode & 0x0F00u) >> 8u;
+
+    m_sound_timer = m_registers[vx];
+}
+
+void Chip8::Cpu::opcode_Fx1E()
+{
+    uint8_t vx = (m_opcode & 0x0F00u) >> 8u;
+
+    m_address_register += m_registers[vx];
+}
+
+void Chip8::Cpu::opcode_Fx29()
+{
+    uint8_t vx = (m_opcode & 0x0F00u) >> 8u;
+    uint8_t digit = m_registers[vx];
+
+    m_address_register = 0x50 + (5 * digit);
+}
+
+void Chip8::Cpu::opcode_Fx33()
+{
+    uint8_t vx = (m_opcode & 0x0F00u) >> 8u;
+    uint8_t value = m_registers[vx];
+
+    m_memory_manager->set_value(m_address_register + 2, value % 10);
+    value /= 10;
+
+    m_memory_manager->set_value(m_address_register + 1, value % 10);
+    value /= 10;
+
+    m_memory_manager->set_value(m_address_register, value % 10);
+}
+
+void Chip8::Cpu::opcode_Fx55()
+{
+    uint8_t vx = (m_opcode & 0x0F00u) >> 8u;
+
+    for (uint8_t i = 0; i <= vx; ++i) {
+        m_memory_manager->set_value(m_address_register + i, m_registers[i]);
+    }
+}
+
+void Chip8::Cpu::opcode_Fx65()
+{
+    uint8_t vx = (m_opcode & 0x0F00u) >> 8u;
+
+    for (uint8_t i = 0; i <= vx; ++i) {
+        m_registers[i] = m_memory_manager->get_value(m_address_register + i);
+    }
+}
+
+uint8_t* Chip8::Cpu::get_keypad()
+{
+    return m_keypad;
 }
