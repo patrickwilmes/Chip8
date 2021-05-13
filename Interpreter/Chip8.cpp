@@ -25,7 +25,7 @@
 #include <Entity.h>
 #include <Graphics.h>
 #include <Types.h>
-#include <cstdio>
+#include <fstream>
 #include <iostream>
 
 Chip8::Chip8Application::Chip8Application(Graphics::Types::Size size)
@@ -50,8 +50,15 @@ bool Chip8::Chip8Application::update_hook()
 
 void Chip8::Chip8Application::load_program(const std::string& source_file)
 {
-    unsigned char buffer[1 << 12];
-    FILE* file = fopen(source_file.c_str(), "rb");
-    int bytes_read = fread(buffer, sizeof(char), 1 << 12, file);
-    m_memory_manager->place_program(buffer, bytes_read);
+    std::ifstream infile(source_file, std::ios::binary | std::ios::ate);
+    if (infile.is_open()) {
+        std::streampos size = infile.tellg();
+        char *buffer = new char[size];
+
+        infile.seekg(0, std::ios::beg);
+        infile.read(buffer, size);
+        infile.close();
+        m_memory_manager->place_program(buffer, size);
+        delete[] buffer;
+    }
 }

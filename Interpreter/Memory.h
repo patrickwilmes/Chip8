@@ -29,7 +29,7 @@ namespace Chip8 {
     class MemoryManager final {
     public:
         MemoryManager();
-        void place_program(unsigned char* data, int size);
+        void place_program(const char* data, long size);
         void dump();
         unsigned short get_at_position(u32 position);
         bool is_program_end(u32 position);

@@ -40,7 +40,7 @@ void Chip8::MemoryManager::reset_memory()
     }
 }
 
-void Chip8::MemoryManager::place_program(unsigned char* data, int size)
+void Chip8::MemoryManager::place_program(const char* data, long size)
 {
     int program_ptr = 0x200;
     for (size_t i = 0; i < size; i++) {
