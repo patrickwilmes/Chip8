@@ -29,7 +29,7 @@
 #include <iostream>
 
 Chip8::Chip8Application::Chip8Application(Graphics::Types::Size size)
-    : Graphics::Window(size, "Chip8")
+    : Graphics::Window(size, "Chip8"), m_cell_width(size.get_first() / HORIZONTAL_PIXEL_COUNT), m_cell_height(size.get_second() / VERTICAL_PIXEL_COUNT)
 {
     m_memory_manager = std::make_shared<MemoryManager>();
     m_display = std::make_shared<DisplayBuffer>();
